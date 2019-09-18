@@ -5,9 +5,26 @@ import time
 # from os import system
 
 
+class Interpretation:
+    def __init__(self, kind: str, data):
+        self.kind = kind
+        self.data = data
+
+
+class Intrepreter:
+    def __init__(self, name: str):
+        self.name = name
+
+
+class NLU:
+    def __init__(self, name: str):
+        super().__init__(name)
+
+
 class Percept:
-    def __init__(self, sensor_name: str, data):
+    def __init__(self, sensor_name: str, interpreter_name: str, data):
         self.sensor_name = sensor_name
+        self.interpreter_name = interpreter_name
         self.data = data
 
 
@@ -26,8 +43,10 @@ class Actuator:
 
 
 class Sensor:
-    def __init__(self, name: str, percept_callback: Callable[[Percept], None]):
+    def __init__(self, name: str, interpreter_name: str,
+                 percept_callback: Callable[[Percept], None]):
         self.name: str = name
+        self.interpreter_name: str = interpreter_name
         self.status: bool = False
         self.percept_callback = percept_callback
 
@@ -44,13 +63,14 @@ class Speech(Actuator):
     def __init__(self, name: str):
         super().__init__(name)
 
-    def do(action: Action):
+    def do(self, action: Action):
         pass
 
 
 class Audition(Sensor):
-    def __init__(self, name: str, percept_callback: Callable[[Percept], None]):
-        super().__init__(name, percept_callback)
+    def __init__(self, name: str, interpreter_name: str,
+                 percept_callback: Callable[[Percept], None]):
+        super().__init__(name, interpreter_name, percept_callback)
 
         self.r = sr.Recognizer()
         self.m = sr.Microphone()
@@ -69,9 +89,11 @@ class Audition(Sensor):
         if self.status is True:
             try:
                 data = recognizer.recognize_google(audio, language='es_PE')
-                self.percept_callback(Percept(self.name, data))
+                self.percept_callback(
+                    Percept(self.name, self.interpreter_name, data))
             except (LookupError, sr.UnknownValueError):
-                self.percept_callback(Percept(self.name, None))
+                self.percept_callback(
+                    Percept(self.name, self.interpreter_name, None))
             except sr.RequestError as e:
                 print(f"Could not request results from GSR service: {e}")
         else:
@@ -93,6 +115,8 @@ class Agent:
     is_on: bool = False
     actuators: Dict[str, Actuator] = {}
     sensors: Dict[str, Sensor] = {}
+    interpreters: Dict[str, Interpreter] = {}
+    models: Dict[str, Model] = {}
 
     def __init__(self, name: str):
         self.name = name
@@ -107,25 +131,30 @@ class Agent:
     def update_state(self, percept: Percept):
         pass
 
-    def decide(self, last_percept: Percept) -> Action:
-        a = Action("", None)
-        return a
+    def decide(self, ir: Interpretation) -> Action:
+        return self.models[ir.kind].decide(ir)
+
+    def interpret(self, percept: Percept) -> Interpretation:
+        pass
 
     def percept_callback(self, percept: Percept):
         print(f"PERCEPT: {percept.sensor_name} -> {percept.data}")
-        self.update_state(percept)
+        ir = self.interpret(percept)
+
+        # internal representation taken by rule-based or reasoning thinking
+        a: Action = self.decide(ir)
+
         action = self.decide(percept)
 
         print(f"ACTION: {action.actuator_name} -> {action.data}")
 
-        for a_name, actuator in self.actuators.items():
-            if action.actuator_name == a_name:
-                actuator.do(action)
+        self.actuators[action.actuator_name].do(action)
 
 
 if __name__ == "__main__":
     ARCA = Agent("ARCA")
-    hearing = Audition("mic_0", ARCA.percept_callback)
+    nlu = NLU("nlu")
+    hearing = Audition("mic_0", "nlu", ARCA.percept_callback)
     ARCA.add_sensor(hearing)
     ARCA.sensors["mic_0"].on()
     ARCA.list_sensors()
