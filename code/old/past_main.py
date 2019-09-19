@@ -7,15 +7,6 @@ from subprocess import call
 from chatterbot import ChatBot
 from chatterbot.trainers import ChatterBotCorpusTrainer
 
-chatbot = ChatBot(
-    'ARCA',
-    storage_adapter='chatterbot.storage.SQLStorageAdapter',
-    logic_adapters=[{
-        'import_path': 'chatterbot.logic.BestMatch',
-        'default_response': 'Lo siento, no entendí.',
-        'maximum_similarity_threshold': 0.90
-    }],
-    database_uri='sqlite:///database.db')
 
 # Create a new trainer for the chatbot
 trainer = ChatterBotCorpusTrainer(chatbot)

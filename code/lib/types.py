@@ -6,7 +6,10 @@ class Percept:
 
 
 class Interpretation:
-    def __init__(self, kind: str, data):
+    def __init__(self, interpreter_name: str, model_name: str, kind: str,
+                 data):
+        self.interpreter_name = interpreter_name
+        self.model_name = model_name
         self.kind = kind
         self.data = data
 
