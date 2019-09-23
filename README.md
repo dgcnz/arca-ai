@@ -32,7 +32,8 @@ Speech Recognition and Natural Language Processing Engine for ARCA, an interdisc
     <td>
 		<ul style="list-style-type:none; padding-left: 0;">
 		<li><input disabled="" type="checkbox"> Look for other Human-Robot Interaction NLU approaches.</li>
-		<li><input disabled="" type="checkbox"> Read Embodied Construction Grammar papers</li>
+		<li><input disabled="" type="checkbox"> Read Embodied Construction Grammar papers.</li>
+		<li><input disabled="" type="checkbox"> RBP set up Audition-Voice path.</li>
 	</ul>
   </tr>
   <tr>
