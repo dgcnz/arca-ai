@@ -8,8 +8,15 @@ from lib.actuators.speech import Speech
 la = [{
     'import_path': 'chatterbot.logic.BestMatch',
     'default_response': 'Lo siento, no entendí.',
-    'maximum_similarity_threshold': 0.90
+    'maximum_similarity_threshold': 0.80
 }]
+
+corpuses = [
+    'chatterbot.corpus.spanish.conversations',
+    'chatterbot.corpus.spanish.greetings',
+    'chatterbot.corpus.spanish.trivia',
+    'chatterbot.corpus.spanish.ia',
+]
 
 
 def main():
@@ -18,6 +25,7 @@ def main():
     hearing = Audition("mic_0", "nlu", ARCA.percept_callback)
     nlu = NLU("nlu", ["chatterbot"])
     cbot = Chatterbot("chatterbot", "ARCA", la)
+    cbot.train(corpuses)
     voice = Speech("speech")
 
     ARCA.add_sensor(hearing)
