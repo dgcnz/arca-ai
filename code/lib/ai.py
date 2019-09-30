@@ -91,23 +91,24 @@ class Agent(Subject):
         #   of the Agent
         if percept.data is None:
             print("Empty percept.")
+            self.sensors[percept.sensor_name].resume()
             return
 
         print(f"PERCEPT: {percept.sensor_name} -> {percept.data}")
 
-        self.notify_observers("percept")
+        # self.notify_observers("percept")
 
         ir: Interpretation = self.interpret(percept)
 
-        self.notify_observers()
+        # self.notify_observers()
 
         # internal representation taken by rule-based or reasoning thinking
         actions: List[Action] = self.decide(ir)
 
-        self.notify_observers()
+        # self.notify_observers()
 
         for action in actions:
             print(f"ACTION: {action.actuator_name} -> {action.data}")
             self.actuators[action.actuator_name].do(action)
 
-
+        self.sensors[percept.sensor_name].resume()

@@ -12,5 +12,4 @@ code/lib/models/__pycache__/*
 code/lib/actuators/__pycache__/*
 code/lib/observers/__pycache__/*
 code/logs/*
-
-
+code/build/

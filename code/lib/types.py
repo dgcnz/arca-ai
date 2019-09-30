@@ -1,3 +1,12 @@
+from enum import Enum, auto
+
+
+class Status(Enum):
+    RUNNING = auto()
+    PAUSED = auto()
+    STOPPED = auto()
+
+
 class Percept:
     def __init__(self, sensor_name: str, interpreter_name: str, data):
         self.sensor_name = sensor_name

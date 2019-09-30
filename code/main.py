@@ -28,18 +28,18 @@ def main():
     ARCA = Agent("ARCA")
     ARCA.attach_observer(server)
 
-    # hearing = Audition("mic_0", "nlu", ARCA.percept_callback)
+    hearing = Audition("mic_0", "nlu", ARCA.percept_callback)
     nlu = NLU("nlu", ["chatterbot"])
     cbot = Chatterbot("chatterbot", "ARCA", la)
     cbot.train(corpuses)
-    # voice = Speech("speech")
+    voice = Speech("speech")
 
-    # ARCA.add_sensor(hearing)
+    ARCA.add_sensor(hearing)
     ARCA.add_interpreter(nlu)
     ARCA.add_model(cbot)
-    # ARCA.add_actuator(voice)
+    ARCA.add_actuator(voice)
 
-    # ARCA.sensors["mic_0"].on()
+    ARCA.sensors["mic_0"].on()
     ARCA.list_all()
 
     while True:
