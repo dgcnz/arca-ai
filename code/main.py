@@ -4,11 +4,12 @@ from lib.sensors.audition import Audition
 from lib.interpreters.nlu import NLU
 from lib.models.chatterbot_model import Chatterbot
 from lib.actuators.speech import Speech
+from lib.observers.web import WebInterface
 
 la = [{
     'import_path': 'chatterbot.logic.BestMatch',
     'default_response': 'Lo siento, no entendí.',
-    'maximum_similarity_threshold': 0.80
+    'maximum_similarity_threshold': 0.60
 }]
 
 corpuses = [
@@ -20,20 +21,25 @@ corpuses = [
 
 
 def main():
-    ARCA = Agent("ARCA")
 
-    hearing = Audition("mic_0", "nlu", ARCA.percept_callback)
+    server = WebInterface("localhost", 8000)
+    server.activate()
+
+    ARCA = Agent("ARCA")
+    ARCA.attach_observer(server)
+
+    # hearing = Audition("mic_0", "nlu", ARCA.percept_callback)
     nlu = NLU("nlu", ["chatterbot"])
     cbot = Chatterbot("chatterbot", "ARCA", la)
     cbot.train(corpuses)
-    voice = Speech("speech")
+    # voice = Speech("speech")
 
-    ARCA.add_sensor(hearing)
+    # ARCA.add_sensor(hearing)
     ARCA.add_interpreter(nlu)
     ARCA.add_model(cbot)
-    ARCA.add_actuator(voice)
+    # ARCA.add_actuator(voice)
 
-    ARCA.sensors["mic_0"].on()
+    # ARCA.sensors["mic_0"].on()
     ARCA.list_all()
 
     while True:

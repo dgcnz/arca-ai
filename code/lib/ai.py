@@ -3,10 +3,13 @@ from lib.sensors.sensor_base import Sensor
 from lib.interpreters.interpreter_base import Interpreter
 from lib.models.model_base import Model
 from lib.actuators.actuator_base import Actuator
+from lib.observers.web import WebInterface
+from lib.observers.observer_base import Subject, Observer
+from lib.observers.web import WebInterface
 from typing import Dict, List
 
 
-class Agent:
+class Agent(Subject):
     """Class to generalize Agents.
 
     Keyword arguments:
@@ -24,6 +27,7 @@ class Agent:
     sensors: Dict[str, Sensor] = {}
     interpreters: Dict[str, Interpreter] = {}
     models: Dict[str, Model] = {}
+    observers: List[Observer] = []
 
     def __init__(self, name: str):
         self.name = name
@@ -39,6 +43,16 @@ class Agent:
 
     def add_actuator(self, a: Actuator) -> None:
         self.actuators[a.name] = a
+
+    def attach_observer(self, observer: Observer) -> None:
+        self.observers.append(observer)
+
+    def detach_observer(self, observer: Observer) -> None:
+        self.observers.remove(observer)
+
+    def notify_observers(self, keyword: str) -> None:
+        for obs in self.observers:
+            obs.update(self, keyword)
 
     def list_sensors(self) -> None:
         for s_name, sensor in self.sensors.items():
@@ -80,11 +94,20 @@ class Agent:
             return
 
         print(f"PERCEPT: {percept.sensor_name} -> {percept.data}")
+
+        self.notify_observers("percept")
+
         ir: Interpretation = self.interpret(percept)
+
+        self.notify_observers()
 
         # internal representation taken by rule-based or reasoning thinking
         actions: List[Action] = self.decide(ir)
 
+        self.notify_observers()
+
         for action in actions:
             print(f"ACTION: {action.actuator_name} -> {action.data}")
             self.actuators[action.actuator_name].do(action)
+
+

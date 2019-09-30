@@ -10,3 +10,7 @@ code/lib/sensors/__pycache__/*
 code/lib/interpreters/__pycache__/*
 code/lib/models/__pycache__/*
 code/lib/actuators/__pycache__/*
+code/lib/observers/__pycache__/*
+code/logs/*
+
+
