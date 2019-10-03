@@ -53,7 +53,7 @@ class Audition(Sensor):
             # output=True,
             frames_per_buffer=self.CHUNK)
 
-        in_speech_bf = False
+        utterance_started = False
 
         self.stream.start_stream()
 
@@ -72,9 +72,9 @@ class Audition(Sensor):
             if buf:
                 buf = self.filter(buf)
                 self.decoder.process_raw(buf, False, False)
-                if self.decoder.get_in_speech() != in_speech_bf:
-                    in_speech_bf = self.decoder.get_in_speech()
-                    if not in_speech_bf:
+                if self.decoder.get_in_speech() != utterance_started:
+                    utterance_started = self.decoder.get_in_speech()
+                    if not utterance_started:
                         self.pause()
 
                         self.decoder.end_utt()
@@ -91,3 +91,4 @@ class Audition(Sensor):
             else:
                 break
         self.decoder.end_utt()
+        # dump audio file

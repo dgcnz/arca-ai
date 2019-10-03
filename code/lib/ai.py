@@ -3,9 +3,7 @@ from lib.sensors.sensor_base import Sensor
 from lib.interpreters.interpreter_base import Interpreter
 from lib.models.model_base import Model
 from lib.actuators.actuator_base import Actuator
-from lib.observers.web import WebInterface
 from lib.observers.observer_base import Subject, Observer
-from lib.observers.web import WebInterface
 from typing import Dict, List
 
 
@@ -31,6 +29,12 @@ class Agent(Subject):
 
     def __init__(self, name: str):
         self.name = name
+
+    def shutdown(self):
+        print(f"Shutting down {self.name}")
+        for s_name, sensor in self.sensors.items():
+            sensor.off()
+        print(f"Done.")
 
     def add_sensor(self, s: Sensor) -> None:
         self.sensors[s.name] = s

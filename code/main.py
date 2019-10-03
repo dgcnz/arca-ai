@@ -19,13 +19,14 @@ corpuses = [
     'chatterbot.corpus.spanish.ia',
 ]
 
+ARCA = Agent("ARCA")
+
 
 def main():
 
     server = WebInterface("localhost", 8000)
     server.activate()
 
-    ARCA = Agent("ARCA")
     ARCA.attach_observer(server)
 
     hearing = Audition("mic_0", "nlu", ARCA.percept_callback)
@@ -47,4 +48,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        ARCA.shutdown()
