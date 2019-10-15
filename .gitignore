@@ -1,6 +1,7 @@
 test_pykaldi/
 .DS_Store
 code/.venv/
+code/env/
 code/database.db
 code/sentence_tokenizer.pickle
 code/lib/.save_ai.py
@@ -10,3 +11,13 @@ code/lib/sensors/__pycache__/*
 code/lib/interpreters/__pycache__/*
 code/lib/models/__pycache__/*
 code/lib/actuators/__pycache__/*
+code/lib/observers/__pycache__/*
+code/logs/*
+code/build/
+code/database.db-shm
+code/database.db-wal
+code/lib/utilities/background.wav
+code/lib/utilities/record.py
+code/lib/utilities/voice.wav
+code/resources/model
+code/resources/keys

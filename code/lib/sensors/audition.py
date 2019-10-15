@@ -1,38 +1,50 @@
 from lib.sensors.sensor_base import Sensor
-from lib.types import Percept
-from typing import Callable
-import speech_recognition as sr
+from lib.types import Status, Identifier
+from typing import List
+import pyaudio
 
 
 class Audition(Sensor):
-    def __init__(self, name: str, interpreter_name: str,
-                 percept_callback: Callable[[Percept], None]):
-        super().__init__(name, interpreter_name, percept_callback)
+    def __init__(self, name: str):
+        super().__init__(name, self.perceiver)
 
-        self.r = sr.Recognizer()
-        self.m = sr.Microphone()
+        self.CHUNK = 1024 * 4
+        self.RATE = 48000
+        self.FORMAT = pyaudio.paInt16
+        self.CHANNELS = 1
 
-        with self.m as source:
-            (self.r).adjust_for_ambient_noise(source)
+    def get_destinations_ID(self, raw_data) -> List[Identifier]:
+        return [self.destinations_ID[0]]
 
-    def on(self):
-        super().on()
-        (self.r).listen_in_background(self.m, self.callback)
-
-    def off(self):
-        super().off()
-
-    def callback(self, recognizer, audio):
-        if self.status is True:
-            try:
-                data = recognizer.recognize_google(audio, language='es_PE')
-                self.percept_callback(
-                    Percept(self.name, self.interpreter_name, data))
-            except (LookupError, sr.UnknownValueError):
-                self.percept_callback(
-                    Percept(self.name, self.interpreter_name, None))
-            except sr.RequestError as e:
-                print(f"Could not request results from GSR service: {e}")
+    def pass_msg(self, msg: str) -> None:
+        if msg == "PAUSE":
+            self.pause()
+        elif msg == "RESUME":
+            self.resume()
         else:
-            print("Status was OFF.")
-            return
+            raise Exception("Unrecognized message.")
+
+    def perceiver(self):
+        p = pyaudio.PyAudio()
+        stream = p.open(
+            format=self.FORMAT,
+            channels=self.CHANNELS,
+            rate=self.RATE,
+            input=True,
+            frames_per_buffer=self.CHUNK)
+
+        stream.start_stream()
+
+        while True:
+            if self.status == Status.STOPPED:
+                break
+            self.wait_event.wait()
+
+            data = stream.read(self.CHUNK, exception_on_overflow=False)
+
+            if data != b'':
+                self.send(data)
+
+        stream.stop_stream()
+        stream.close()
+        p.terminate()

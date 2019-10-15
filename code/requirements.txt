@@ -1,4 +1,8 @@
-SpeechRecognition==3.8.1
 chatterbot-corpus
-chatterbot
-PyAudio
+chatterbot==1.0.4
+pytz
+pyttsx3
+pocketsphinx
+pyaudio
+google-cloud-speech
+flask

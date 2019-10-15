@@ -1,5 +1,5 @@
-from typing import List
-from lib.types import Interpretation, Action
+from typing import List, Any
+from lib.types import Interpretation, Identifier
 from lib.models.model_base import Model
 from chatterbot.trainers import ChatterBotCorpusTrainer
 from chatterbot import ChatBot
@@ -15,7 +15,7 @@ from chatterbot.logic import LogicAdapter
 class Chatterbot(Model):
     def __init__(self, name: str, agent_name: str,
                  logic_adapters: List[LogicAdapter]):
-        super().__init__(name, "rule")
+        super().__init__(name)
 
         self.chatbot = ChatBot(
             agent_name,
@@ -26,11 +26,18 @@ class Chatterbot(Model):
         self.trainer = ChatterBotCorpusTrainer(self.chatbot)
 
     def train(self, model_corpuses):
-
         for corpus in model_corpuses:
             (self.trainer).train(corpus)
 
-    def decide(self, ir: Interpretation) -> List[Action]:
-        # TODO: Model need to know possible actuators
+    def decide(self, ir: Interpretation) -> List[Any]:
+        if ir.data is None:
+            return []
         ans = self.chatbot.get_response(ir.data)
-        return [Action("speech", str(ans))]
+        return [str(ans)]
+
+    def get_destinations_ID(self, raw_data) -> List[Identifier]:
+        """Given some data, decide destination. Must handle None/empty data."""
+        return [self.destinations_ID[0]]
+
+    def pass_msg(self, msg: str) -> None:
+        pass
