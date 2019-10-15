@@ -1,10 +1,10 @@
-from lib.types import Percept, Interpretation, Action
+from lib.types import Percept, Interpretation, Action, Entity, Information
 from lib.sensors.sensor_base import Sensor
 from lib.interpreters.interpreter_base import Interpreter
 from lib.models.model_base import Model
 from lib.actuators.actuator_base import Actuator
 from lib.observers.observer_base import Subject, Observer
-from typing import Dict, List
+from typing import Dict, List, Union, Optional
 
 
 class Agent(Subject):
@@ -12,7 +12,6 @@ class Agent(Subject):
 
     Keyword arguments:
     name -- name of the agent
-    is_on -- true if Agent is listening in background (default false)
     actuators -- dict of instances of subclasses of the Actuator class.
     sensors -- dict of instances of subclasses of the Sensor class.
     interpreters -- dict of instances of subclasses of the Interpreter class.
@@ -20,7 +19,6 @@ class Agent(Subject):
     """
 
     name: str = ""
-    is_on: bool = False
     actuators: Dict[str, Actuator] = {}
     sensors: Dict[str, Sensor] = {}
     interpreters: Dict[str, Interpreter] = {}
@@ -58,61 +56,29 @@ class Agent(Subject):
         for obs in self.observers:
             obs.update(self, keyword)
 
-    def list_sensors(self) -> None:
-        for s_name, sensor in self.sensors.items():
-            print(f"{s_name}: {'ON' if sensor.status is True else 'OFF'}")
+    def sendID(self,
+               msg: Union[Information, str],
+               rcv: Optional[Entity] = None):
 
-    def list_interpreters(self) -> None:
-        for i_name, interpreter in self.interpreters.items():
-            print(f"{i_name}")
+        fwdlist = {
+            "Sensor": self.sensors,
+            "Interpreter": self.interpreters,
+            "Model": self.models,
+            "Actuator": self.actuators
+        }
+        if isinstance(msg, Information):
+            print(
+                f"Information is passed from {msg.src.name} to {msg.dest.name}."
+            )
+            fwdlist[msg.dest.category][msg.dest.name].put(msg)
+        elif isinstance(msg, str):
+            if rcv is None:
+                raise Exception(
+                    "If message is a string, a receiver must be specified.")
+            print(f"MESSAGE {msg} was passed to {rcv.name}.")
+            fwdlist[rcv.category][rcv.name].pass_msg(msg)
 
-    def list_models(self) -> None:
-        for m_name, model in self.models.items():
-            print(f"{m_name}: {model.kind}")
-
-    def list_actuators(self) -> None:
-        for a_name, actuator in self.actuators.items():
-            print(f"{a_name}")
-
-    def list_all(self) -> None:
-        self.list_sensors()
-        self.list_interpreters()
-        self.list_models()
-        self.list_actuators()
-
-    def update_state(self, percept: Percept):
-        pass
-
-    def decide(self, ir: Interpretation) -> Action:
-        return self.models[ir.model_name].decide(ir)
-
-    def interpret(self, percept: Percept) -> Interpretation:
-        return self.interpreters[percept.interpreter_name].interpret(percept)
-
-    def percept_callback(self, percept: Percept):
-        # Commments:
-        # - Percept callback shouldn't have control over all the functionality
-        #   of the Agent
-        if percept.data is None:
-            print("Empty percept.")
-            self.sensors[percept.sensor_name].resume()
-            return
-
-        print(f"PERCEPT: {percept.sensor_name} -> {percept.data}")
-
-        # self.notify_observers("percept")
-
-        ir: Interpretation = self.interpret(percept)
-
-        # self.notify_observers()
-
-        # internal representation taken by rule-based or reasoning thinking
-        actions: List[Action] = self.decide(ir)
-
-        # self.notify_observers()
-
-        for action in actions:
-            print(f"ACTION: {action.actuator_name} -> {action.data}")
-            self.actuators[action.actuator_name].do(action)
-
-        self.sensors[percept.sensor_name].resume()
+    def associate(self, src: Entity, dest: Entity):
+        print(f"{self.name} >> Associating {src.dumpID().category}:{src.dumpID().name} with {dest.dumpID().category}:{dest.dumpID().name}")
+        src.add_destination_ID(dest.dumpID())
+        src.sendID = self.sendID

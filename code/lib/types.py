@@ -1,4 +1,5 @@
 from enum import Enum, auto
+from typing import Callable, List
 
 
 class Status(Enum):
@@ -7,23 +8,46 @@ class Status(Enum):
     STOPPED = auto()
 
 
-class Percept:
-    def __init__(self, sensor_name: str, interpreter_name: str, data):
-        self.sensor_name = sensor_name
-        self.interpreter_name = interpreter_name
+class Identifier:
+    def __init__(self, name: str, category: str):
+        self.name = name
+        self.category = category
+
+
+class Entity:
+    def __init__(self, name):
+        self.name: str = name
+        self.destinations_ID: List[Identifier] = []
+        self.sendID: Callable[[Identifier], None]
+
+    def add_destination_ID(self, dest_ID: Identifier):
+        self.destinations_ID.append(dest_ID)
+
+    def dumpID(self) -> Identifier:
+        base_class = self.__class__.__bases__[0].__name__
+        return Identifier(self.name, base_class)
+
+
+class Information:
+    pass
+
+
+class Percept(Information):
+    def __init__(self, src: Identifier, dest: Identifier, data):
+        self.src = src
+        self.dest = dest
         self.data = data
 
 
-class Interpretation:
-    def __init__(self, interpreter_name: str, model_name: str, kind: str,
-                 data):
-        self.interpreter_name = interpreter_name
-        self.model_name = model_name
-        self.kind = kind
+class Interpretation(Information):
+    def __init__(self, src: Identifier, dest: Identifier, data):
+        self.src = src
+        self.dest = dest
         self.data = data
 
 
-class Action:
-    def __init__(self, actuator_name: str, data):
-        self.actuator_name = actuator_name
+class Action(Information):
+    def __init__(self, src: Identifier, dest: Identifier, data):
+        self.src = src
+        self.dest = dest
         self.data = data
