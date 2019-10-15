@@ -1,6 +1,6 @@
-# ARCA NLP Engine
+# ARCA AI
 
-Speech Recognition and Natural Language Processing Engine for ARCA, an interdisciplinary project at UTEC.
+A full AI Architecture for ARCA, an interdisciplinary project at UTEC.
 
 ## TODO
 
