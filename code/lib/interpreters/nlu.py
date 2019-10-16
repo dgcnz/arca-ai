@@ -25,10 +25,12 @@ class NLU(Interpreter):
         return [self.destinations_ID[0]]
 
     def preprocess(self, raw_data):
-
+        if raw_data is None:
+            return None
         # Remove all non-ascii characters
-        res = unicodedata.normalize('NKFD', raw_data)
-        res = res.encode('ascii', 'ignore').decode('utf-8')
+        res = unicodedata.normalize('NFKD',
+                                    raw_data).encode('ascii',
+                                                     'ignore').decode('utf-8')
 
         # tokenize
         tokens = tokenize(res)

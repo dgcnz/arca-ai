@@ -1,7 +1,6 @@
 categories:
 - greetings
 conversations:
-
 - - hola
   - hola
 - - hola
@@ -10,6 +9,10 @@ conversations:
   - hola
 - - hola
   - saludos
+- - que tal
+  - bien
+- - hola que tal
+  - bien y tu
 - - hola como estas
   - bien
 - - hola como te va
