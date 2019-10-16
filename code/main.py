@@ -14,10 +14,7 @@ la = [{
 }]
 
 corpuses = [
-    'chatterbot.corpus.spanish.conversations',
-    'chatterbot.corpus.spanish.greetings',
-    'chatterbot.corpus.spanish.trivia',
-#    'chatterbot.corpus.spanish.ia',
+    './resources/corpuses/spanish/',
 ]
 
 ARCA = Agent("ARCA")
