@@ -6,3 +6,6 @@ pocketsphinx
 pyaudio
 google-cloud-speech
 flask
+numpy
+nltk
+scipy

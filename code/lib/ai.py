@@ -1,10 +1,11 @@
-from lib.types import Percept, Interpretation, Action, Entity, Information
+from lib.types import Entity, Information
 from lib.sensors.sensor_base import Sensor
 from lib.interpreters.interpreter_base import Interpreter
 from lib.models.model_base import Model
 from lib.actuators.actuator_base import Actuator
 from lib.observers.observer_base import Subject, Observer
 from typing import Dict, List, Union, Optional
+import logging
 
 
 class Agent(Subject):
@@ -34,17 +35,15 @@ class Agent(Subject):
             sensor.off()
         print(f"Done.")
 
-    def add_sensor(self, s: Sensor) -> None:
-        self.sensors[s.name] = s
-
-    def add_interpreter(self, i: Interpreter) -> None:
-        self.interpreters[i.name] = i
-
-    def add_model(self, m: Model) -> None:
-        self.models[m.name] = m
-
-    def add_actuator(self, a: Actuator) -> None:
-        self.actuators[a.name] = a
+    def add_entity(self, e: Entity) -> None:
+        fwdlist = {
+            "Sensor": self.sensors,
+            "Interpreter": self.interpreters,
+            "Model": self.models,
+            "Actuator": self.actuators
+        }
+        print(f"Adding entity {e.dumpID().category}:{e.dumpID().name}.")
+        fwdlist[e.dumpID().category][e.dumpID().name] = e
 
     def attach_observer(self, observer: Observer) -> None:
         self.observers.append(observer)
@@ -58,7 +57,17 @@ class Agent(Subject):
 
     def sendID(self,
                msg: Union[Information, str],
-               rcv: Optional[Entity] = None):
+               rcv: Optional[Entity] = None) -> None:
+        """
+        Callback function that is executed in an Entity to pass a msg (can be Information or just a string) to another Entity.
+
+        Args:
+            msg (Union[Information, str]): message can be a Percept, Interpretation, Action or string.
+            rcv (Optional[Entity]): receiver might be optional, since Information already contains such data.
+
+        Returns:
+            None
+        """
 
         fwdlist = {
             "Sensor": self.sensors,
@@ -78,7 +87,12 @@ class Agent(Subject):
             print(f"MESSAGE {msg} was passed to {rcv.name}.")
             fwdlist[rcv.category][rcv.name].pass_msg(msg)
 
-    def associate(self, src: Entity, dest: Entity):
-        print(f"{self.name} >> Associating {src.dumpID().category}:{src.dumpID().name} with {dest.dumpID().category}:{dest.dumpID().name}")
+    def associate(self, src: Entity, dest: Entity) -> None:
+        """
+        Adds dest destination to src Entity and defines src's sendID() with Agent's sendID().
+        """
+        print(
+            f"{self.name} >> Associating {src.dumpID().category}:{src.dumpID().name} with {dest.dumpID().category}:{dest.dumpID().name}"
+        )
         src.add_destination_ID(dest.dumpID())
         src.sendID = self.sendID

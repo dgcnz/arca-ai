@@ -25,20 +25,24 @@ class Audition(Sensor):
             raise Exception("Unrecognized message.")
 
     def perceiver(self):
+        # TODO: abstract configuration from perceiver function
+        # --------------------- should go into a setup function -----------
         p = pyaudio.PyAudio()
-        stream = p.open(
-            format=self.FORMAT,
-            channels=self.CHANNELS,
-            rate=self.RATE,
-            input=True,
-            frames_per_buffer=self.CHUNK)
-
+        stream = p.open(format=self.FORMAT,
+                        channels=self.CHANNELS,
+                        rate=self.RATE,
+                        input=True,
+                        frames_per_buffer=self.CHUNK)
+        # -----------------------------------------------------------------
         stream.start_stream()
 
         while True:
+            # TODO: abstract stopped event
+            # -----------------------------------------------------
             if self.status == Status.STOPPED:
                 break
             self.wait_event.wait()
+            # -----------------------------------------------------
 
             data = stream.read(self.CHUNK, exception_on_overflow=False)
 
