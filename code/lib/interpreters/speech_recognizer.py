@@ -1,11 +1,11 @@
 from lib.interpreters.interpreter_base import Interpreter
 from lib.types import Identifier
-from typing import List, Any, Generator
+from typing import List, Generator
 from os import path
 from pocketsphinx.pocketsphinx import Decoder
-from pocketsphinx import get_model_path
 from google.cloud import speech
 from google.oauth2 import service_account
+
 
 class SpeechRecognizer(Interpreter):
     def __init__(self, name: str, sr: str = "pocketsphinx"):
@@ -46,7 +46,8 @@ class SpeechRecognizer(Interpreter):
             sample_rate_hertz=self.RATE,
         )
         self.client = speech.SpeechClient(credentials=credentials)
-        self.streaming_config = speech.types.StreamingRecognitionConfig(config=config)
+        self.streaming_config = speech.types.StreamingRecognitionConfig(
+            config=config)
         print("Done setting up Google Speech.")
 
     def get_destinations_ID(self, raw_data) -> List[Identifier]:
@@ -56,7 +57,7 @@ class SpeechRecognizer(Interpreter):
         """Filtering"""
         return raw_data
 
-    def process(self, raw_data, processed_data) -> Generator:
+    def process(self, raw_data) -> Generator:
         self.decoder.process_raw(raw_data, False, False)
         cur_buf_is_speech = self.decoder.get_in_speech()
         data = None
@@ -80,11 +81,10 @@ class SpeechRecognizer(Interpreter):
             yield True
             self.decoder.end_utt()
             if (self.sr == "googlespeech"):
-                requests = (speech.types.StreamingRecognizeRequest(audio_content=chunk)
-                        for chunk in self.current_data)
+                requests = (speech.types.StreamingRecognizeRequest(
+                    audio_content=chunk) for chunk in self.current_data)
                 responses = self.client.streaming_recognize(
-                    config=self.streaming_config,
-                    requests=requests)
+                    config=self.streaming_config, requests=requests)
                 try:
                     response = next(responses)
                     data = response.results[0].alternatives[0].transcript
@@ -104,7 +104,8 @@ class SpeechRecognizer(Interpreter):
                     print(f"{self.name}>> {e}")
                     conf = None
                     data = None
-            print(f"{self.name}>> Heard DATA: '{data}' with confidence:{conf}.")
+            print(
+                f"{self.name}>> Heard DATA: '{data}' with confidence: {conf}.")
             self.decoder.start_utt()
             self.prev_buf_is_speech = cur_buf_is_speech
         else:

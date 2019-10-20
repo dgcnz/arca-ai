@@ -5,7 +5,7 @@ from lib.interpreters.nlu import NLU
 from lib.interpreters.speech_recognizer import SpeechRecognizer
 from lib.models.chatterbot_model import Chatterbot
 from lib.actuators.speech import Speech
-from lib.observers.web import WebInterface
+# from lib.observers.web import WebInterface
 
 la = [{
     'import_path': 'chatterbot.logic.BestMatch',
@@ -34,11 +34,11 @@ def main():
     cbot.train(corpuses)
     voice = Speech("speech")
 
-    ARCA.add_sensor(hearing)
-    ARCA.add_interpreter(nlu)
-    ARCA.add_interpreter(sr)
-    ARCA.add_model(cbot)
-    ARCA.add_actuator(voice)
+    ARCA.add_entity(hearing)
+    ARCA.add_entity(nlu)
+    ARCA.add_entity(sr)
+    ARCA.add_entity(cbot)
+    ARCA.add_entity(voice)
 
     ARCA.associate(hearing, sr)
     ARCA.associate(sr, nlu)
@@ -49,9 +49,14 @@ def main():
     ARCA.interpreters["nlu"].listen()
 
     ARCA.sensors["mic_0"].on()
+    ARCA.sensors["mic_0"].pause()
 
     while True:
-        time.sleep(0.1)
+        x = input("\t>>COMMAND: ")
+        if (x == "listen"):
+            ARCA.sensors["mic_0"].resume()
+        elif (x == "stop"):
+            ARCA.sensors["mic_0"].pause()
 
 
 if __name__ == "__main__":

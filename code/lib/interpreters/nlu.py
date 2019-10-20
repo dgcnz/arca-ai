@@ -42,7 +42,7 @@ class NLU(Interpreter):
         res = untokenize(tokens)
         return res
 
-    def process(self, raw_data, processed_data) -> Generator:
+    def process(self, raw_data) -> Generator:
         yield True
         yield raw_data
         return

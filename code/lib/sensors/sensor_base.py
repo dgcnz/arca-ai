@@ -13,13 +13,21 @@ class Sensor(Entity, ABC):
         self.wait_event = Event()
         self.status = Status.STOPPED
 
-    def on(self):
+    def on(self) -> None:
+        """
+        Sets wait_event to allow processing and
+        starts sense function in another thread.
+        """
         self.status = Status.RUNNING
         self.wait_event.set()
         print(f"{self.name} sensor is on.")
         self.__perceiver.start()
 
-    def off(self):
+    def off(self) -> None:
+        """
+        Sets wait_event to allow processing and
+        starts sense function in another thread.
+        """
         self.status = Status.STOPPED
         self.__perceiver.join(timeout=TIMEOUT)
         if self.__perceiver.is_alive():
