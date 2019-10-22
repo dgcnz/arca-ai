@@ -22,3 +22,4 @@ code/lib/utilities/voice.wav
 code/resources/model
 code/resources/keys
 code/__pycache__
+code/lib/utilities/__pycache__

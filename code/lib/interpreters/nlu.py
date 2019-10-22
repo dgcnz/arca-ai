@@ -1,6 +1,6 @@
 from lib.interpreters.interpreter_base import Interpreter
 from lib.types import Identifier
-from typing import List, Generator
+from typing import List, Generator, Any
 from nltk.tokenize.toktok import ToktokTokenizer
 import string
 import unicodedata
@@ -48,4 +48,7 @@ class NLU(Interpreter):
         return
 
     def pass_msg(self, msg: str) -> None:
+        pass
+
+    def dump_history(self, filename: str, data: List[Any]) -> None:
         pass

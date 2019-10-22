@@ -1,6 +1,6 @@
 from lib.interpreters.interpreter_base import Interpreter
 from lib.types import Identifier
-from typing import List, Generator
+from typing import List, Generator, Any
 from os import path
 from pocketsphinx.pocketsphinx import Decoder
 from google.cloud import speech
@@ -118,3 +118,6 @@ class SpeechRecognizer(Interpreter):
     def pass_msg(self, msg: str) -> None:
         if msg == "RESUME":
             self.e.set()
+
+    def dump_history(self, filename: str, data: List[Any]) -> None:
+        pass

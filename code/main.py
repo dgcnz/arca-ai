@@ -45,18 +45,13 @@ def main():
     ARCA.associate(nlu, cbot)
     ARCA.associate(cbot, voice)
 
+    ARCA.status()
     ARCA.interpreters["sr"].listen()
     ARCA.interpreters["nlu"].listen()
 
     ARCA.sensors["mic_0"].on()
-    ARCA.sensors["mic_0"].pause()
-
     while True:
-        x = input("\t>>COMMAND: ")
-        if (x == "listen"):
-            ARCA.sensors["mic_0"].resume()
-        elif (x == "stop"):
-            ARCA.sensors["mic_0"].pause()
+        time.sleep(1)
 
 
 if __name__ == "__main__":

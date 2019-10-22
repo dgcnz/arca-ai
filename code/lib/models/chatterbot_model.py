@@ -41,3 +41,6 @@ class Chatterbot(Model):
 
     def pass_msg(self, msg: str) -> None:
         pass
+
+    def dump_history(self, filename: str, data: List[Any]) -> None:
+        pass

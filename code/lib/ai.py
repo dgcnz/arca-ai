@@ -1,11 +1,15 @@
-from lib.types import Entity, Information
+from lib.types import Entity, Information, Identifier, NestedDefaultDict
 from lib.sensors.sensor_base import Sensor
 from lib.interpreters.interpreter_base import Interpreter
 from lib.models.model_base import Model
 from lib.actuators.actuator_base import Actuator
 from lib.observers.observer_base import Subject, Observer
 from typing import Dict, List, Union, Optional
+from lib.utilities.helpers import create_path
 import logging
+import datetime
+import pprint
+pp = pprint.PrettyPrinter(indent=4)
 
 
 class Agent(Subject):
@@ -25,12 +29,14 @@ class Agent(Subject):
     interpreters: Dict[str, Interpreter] = {}
     models: Dict[str, Model] = {}
     observers: List[Observer] = []
+    history = NestedDefaultDict()
 
     def __init__(self, name: str):
         self.name = name
 
     def shutdown(self):
         print(f"Shutting down {self.name}")
+        self.dump_history()
         for s_name, sensor in self.sensors.items():
             sensor.off()
         print(f"Done.")
@@ -80,12 +86,17 @@ class Agent(Subject):
                 f"Information is passed from {msg.src.name} to {msg.dest.name}."
             )
             fwdlist[msg.dest.category][msg.dest.name].put(msg)
+            self.history[msg.src.category][msg.src.name][msg.dest.category][
+                msg.dest.name].append(msg.data)
         elif isinstance(msg, str):
             if rcv is None:
                 raise Exception(
                     "If message is a string, a receiver must be specified.")
             print(f"MESSAGE {msg} was passed to {rcv.name}.")
             fwdlist[rcv.category][rcv.name].pass_msg(msg)
+
+    def status(self):
+        pp.pprint(self.history)
 
     def associate(self, src: Entity, dest: Entity) -> None:
         """
@@ -96,3 +107,23 @@ class Agent(Subject):
         )
         src.add_destination_ID(dest.dumpID())
         src.sendID = self.sendID
+        self.history[src.dumpID().category][src.dumpID().name][
+            dest.dumpID().category][dest.dumpID().name] = []
+
+    def dump_history(self):
+        fwdlist = {
+            "Sensor": self.sensors,
+            "Interpreter": self.interpreters,
+            "Model": self.models,
+            "Actuator": self.actuators
+        }
+        for src_cat, src_catv in self.history.items():
+            for src_name, src_namev in src_catv.items():
+                for dest_cat, dest_catv in src_namev.items():
+                    for dest_name, data in dest_catv.items():
+                        path = f"logs/{src_cat}/{src_name}/{dest_cat}/{dest_name}"
+                        create_path(path)
+                        timestamp = str(datetime.datetime.now().strftime(
+                            "%y-%m-%d-%H-%M-%S"))
+                        fwdlist[src_cat][src_name].dump_history(
+                            f"{path}/{timestamp}", data)

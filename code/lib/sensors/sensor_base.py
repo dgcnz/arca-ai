@@ -1,17 +1,18 @@
 from lib.types import Percept, Status, Entity, Identifier
 from abc import ABC, abstractmethod
 from threading import Thread, Event
-from typing import Callable, List
+from typing import List, Any
 
 TIMEOUT = 1.0
 
 
 class Sensor(Entity, ABC):
-    def __init__(self, name: str, sense: Callable[[None], None]):
+    def __init__(self, name: str, waitable: bool):
         super().__init__(name)
-        self.__perceiver = Thread(target=sense)
+        self.__perceiver = Thread(target=self.perceiver)
         self.wait_event = Event()
         self.status = Status.STOPPED
+        self.waitable = waitable
 
     def on(self) -> None:
         """
@@ -49,10 +50,38 @@ class Sensor(Entity, ABC):
     def check_status(self):
         print(f"SENSOR.IS_ALIVE(): {self.__perceiver.is_alive()}")
 
+    def perceiver(self):
+        """
+        Reads and sends input. Waits if wait() method was called.
+        """
+        self.setup_perceiver()
+        while True:
+            if self.status == Status.STOPPED:
+                break
+            if self.waitable:
+                self.wait_event.wait()
+
+            data = self.read_input()
+            if data is not None:
+                self.send(data)
+        self.close_perceiver()
+
     @abstractmethod
     def get_destinations_ID(self, raw_data) -> List[Identifier]:
         pass
 
     @abstractmethod
     def pass_msg(self, msg: str) -> None:
+        pass
+
+    @abstractmethod
+    def read_input(self) -> Any:
+        pass
+
+    @abstractmethod
+    def setup_perceiver(self) -> None:
+        pass
+
+    @abstractmethod
+    def close_perceiver(self) -> None:
         pass

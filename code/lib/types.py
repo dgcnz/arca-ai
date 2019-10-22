@@ -1,5 +1,7 @@
 from enum import Enum, auto
-from typing import Callable, List
+from typing import Callable, List, Any
+from abc import ABC, abstractmethod
+from collections import defaultdict
 
 
 class Status(Enum):
@@ -14,7 +16,7 @@ class Identifier:
         self.category = category
 
 
-class Entity:
+class Entity(ABC):
     def __init__(self, name):
         self.name: str = name
         self.destinations_ID: List[Identifier] = []
@@ -26,6 +28,10 @@ class Entity:
     def dumpID(self) -> Identifier:
         base_class = self.__class__.__bases__[0].__name__
         return Identifier(self.name, base_class)
+
+    @abstractmethod
+    def dump_history(self, _id: Identifier, history: List[Any]) -> None:
+        pass
 
 
 class Information:
@@ -51,3 +57,12 @@ class Action(Information):
         self.src = src
         self.dest = dest
         self.data = data
+
+
+class NestedDefaultDict(defaultdict):
+    def __init__(self, *args, **kwargs):
+        super(NestedDefaultDict, self).__init__(NestedDefaultDict, *args,
+                                                **kwargs)
+
+    def __repr__(self):
+        return repr(dict(self))

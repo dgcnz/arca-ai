@@ -1,6 +1,7 @@
 from lib.actuators.actuator_base import Actuator
 from lib.types import Action
 from subprocess import call
+from typing import List, Any
 
 
 class Speech(Actuator):
@@ -12,4 +13,7 @@ class Speech(Actuator):
         call(["python", "lib/utilities/speak.py", action.data])
 
     def pass_msg(self, msg: str) -> None:
+        pass
+
+    def dump_history(self, filename: str, data: List[Any]) -> None:
         pass
