@@ -5,9 +5,7 @@ from lib.models.model_base import Model
 from lib.actuators.actuator_base import Actuator
 from lib.observers.observer_base import Subject, Observer
 from typing import Dict, List, Union, Optional
-from lib.utilities.helpers import create_path
-import logging
-import datetime
+from lib.utilities.helpers import create_path, get_date, get_logger
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -123,7 +121,6 @@ class Agent(Subject):
                     for dest_name, data in dest_catv.items():
                         path = f"logs/{src_cat}/{src_name}/{dest_cat}/{dest_name}"
                         create_path(path)
-                        timestamp = str(datetime.datetime.now().strftime(
-                            "%y-%m-%d-%H-%M-%S"))
+                        timestamp = get_date()
                         fwdlist[src_cat][src_name].dump_history(
                             f"{path}/{timestamp}", data)

@@ -15,6 +15,9 @@ class Identifier:
         self.name = name
         self.category = category
 
+    def to_tuple(self):
+        return self.name, self.category
+
 
 class Entity(ABC):
     def __init__(self, name):
