@@ -41,6 +41,15 @@ Actuator
 .. automodule:: lib.actuators.actuator_base
    :members:
 
+Audition Sensor
+===================
+.. automodule:: lib.sensors.audition
+   :members:
+
+Speech Recognizer Interpreter
+===================
+.. automodule:: lib.interpreters.speech_recognizer
+   :members:
 
 Indices and tables
 ==================

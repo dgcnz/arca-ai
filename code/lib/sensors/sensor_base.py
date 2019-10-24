@@ -24,8 +24,7 @@ class Sensor(Component, ABC):
 
     def on(self) -> None:
         """
-        Sets wait_event to allow processing and
-        starts sense function in another thread.
+        Sets wait_event to allow processing and starts sense function in another thread.
         """
         self.status = Status.RUNNING
         self.wait_event.set()
@@ -34,8 +33,7 @@ class Sensor(Component, ABC):
 
     def off(self) -> None:
         """
-        Sets wait_event to allow processing and
-        starts sense function in another thread.
+        Sets status to STOPPED and waits for the __perceiver Thread to join.
         """
         self.status = Status.STOPPED
         self.__perceiver.join(timeout=TIMEOUT)

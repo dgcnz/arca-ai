@@ -17,7 +17,7 @@ class Agent(Subject):
         name (str): name of the agent
         actuators (Dict[str, Actuator]): collection of Actuators
         sensors (Dict[str, Sensor]): collection of Sensors
-        interpreters (Dict[str, Intepreter]): collection of Interpreters
+        interpreters (Dict[str, Interpreter]): collection of Interpreters
         models (Dict[str, Model]): collection of Models
         observers (List[Observer]): collection of Observers (DP)
         history (NestedDefaultDict): Stores messages from source Component to destination Component in structure `src.category/src.name/dest.category/dest.name`.
