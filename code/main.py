@@ -34,18 +34,17 @@ def main():
     cbot.train(corpuses)
     voice = Speech("speech")
 
-    ARCA.add_entity(hearing)
-    ARCA.add_entity(nlu)
-    ARCA.add_entity(sr)
-    ARCA.add_entity(cbot)
-    ARCA.add_entity(voice)
+    ARCA.add_component(hearing)
+    ARCA.add_component(nlu)
+    ARCA.add_component(sr)
+    ARCA.add_component(cbot)
+    ARCA.add_component(voice)
 
     ARCA.associate(hearing, sr)
     ARCA.associate(sr, nlu)
     ARCA.associate(nlu, cbot)
     ARCA.associate(cbot, voice)
 
-    ARCA.status()
     ARCA.interpreters["sr"].listen()
     ARCA.interpreters["nlu"].listen()
 

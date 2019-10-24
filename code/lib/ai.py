@@ -1,4 +1,4 @@
-from lib.types import Entity, Information, Identifier, NestedDefaultDict
+from lib.types import Component, Information, Identifier, NestedDefaultDict
 from lib.sensors.sensor_base import Sensor
 from lib.interpreters.interpreter_base import Interpreter
 from lib.models.model_base import Model
@@ -13,12 +13,14 @@ pp = pprint.PrettyPrinter(indent=4)
 class Agent(Subject):
     """Class to generalize Agents.
 
-    Keyword arguments:
-    name -- name of the agent
-    actuators -- dict of instances of subclasses of the Actuator class.
-    sensors -- dict of instances of subclasses of the Sensor class.
-    interpreters -- dict of instances of subclasses of the Interpreter class.
-    models -- dict of instances of subclasses of the Model class.
+    Attributes:
+        name (str): name of the agent
+        actuators (Dict[str, Actuator]): collection of Actuators
+        sensors (Dict[str, Sensor]): collection of Sensors
+        interpreters (Dict[str, Intepreter]): collection of Interpreters
+        models (Dict[str, Model]): collection of Models
+        observers (List[Observer]): collection of Observers (DP)
+        history (NestedDefaultDict): Stores messages from source Component to destination Component in structure `src.category/src.name/dest.category/dest.name`.
     """
 
     name: str = ""
@@ -31,22 +33,30 @@ class Agent(Subject):
 
     def __init__(self, name: str):
         self.name = name
+        self.logger = get_logger(f"{name}", f"logs/Agent/{name}/{get_date()}")
 
-    def shutdown(self):
-        print(f"Shutting down {self.name}")
+    def shutdown(self) -> None:
+        """
+        Dumps history and shuts off every sensor.
+        """
+        self.logger.info(f"Shutting down {self.name}")
         self.dump_history()
         for s_name, sensor in self.sensors.items():
             sensor.off()
-        print(f"Done.")
+        self.logger.info(f"Done.")
 
-    def add_entity(self, e: Entity) -> None:
+    def add_component(self, e: Component) -> None:
+        """
+        Takes a component and appends it to its corresponding collection.
+        """
         fwdlist = {
             "Sensor": self.sensors,
             "Interpreter": self.interpreters,
             "Model": self.models,
             "Actuator": self.actuators
         }
-        print(f"Adding entity {e.dumpID().category}:{e.dumpID().name}.")
+        self.logger.info(
+            f"Adding Component {e.dumpID().category}:{e.dumpID().name}.")
         fwdlist[e.dumpID().category][e.dumpID().name] = e
 
     def attach_observer(self, observer: Observer) -> None:
@@ -61,13 +71,13 @@ class Agent(Subject):
 
     def sendID(self,
                msg: Union[Information, str],
-               rcv: Optional[Entity] = None) -> None:
+               rcv: Optional[Component] = None) -> None:
         """
-        Callback function that is executed in an Entity to pass a msg (can be Information or just a string) to another Entity.
+        Callback function that is executed in an Component to pass a msg (can be Information or just a string) to another Component.
 
         Args:
             msg (Union[Information, str]): message can be a Percept, Interpretation, Action or string.
-            rcv (Optional[Entity]): receiver might be optional, since Information already contains such data.
+            rcv (Optional[Component]): receiver might be optional, since Information already contains such data.
 
         Returns:
             None
@@ -80,7 +90,7 @@ class Agent(Subject):
             "Actuator": self.actuators
         }
         if isinstance(msg, Information):
-            print(
+            self.logger.info(
                 f"Information is passed from {msg.src.name} to {msg.dest.name}."
             )
             fwdlist[msg.dest.category][msg.dest.name].put(msg)
@@ -90,25 +100,25 @@ class Agent(Subject):
             if rcv is None:
                 raise Exception(
                     "If message is a string, a receiver must be specified.")
-            print(f"MESSAGE {msg} was passed to {rcv.name}.")
+            self.logger.info(f"MESSAGE {msg} was passed to {rcv.name}.")
             fwdlist[rcv.category][rcv.name].pass_msg(msg)
 
-    def status(self):
-        pp.pprint(self.history)
-
-    def associate(self, src: Entity, dest: Entity) -> None:
+    def associate(self, src: Component, dest: Component) -> None:
         """
-        Adds dest destination to src Entity and defines src's sendID() with Agent's sendID().
+        Adds dest destination to src Component and defines src's sendID() with Agent's sendID().
         """
-        print(
-            f"{self.name} >> Associating {src.dumpID().category}:{src.dumpID().name} with {dest.dumpID().category}:{dest.dumpID().name}"
+        self.logger.info(
+            f"Associating {src.dumpID().category}:{src.dumpID().name} with {dest.dumpID().category}:{dest.dumpID().name}"
         )
         src.add_destination_ID(dest.dumpID())
         src.sendID = self.sendID
         self.history[src.dumpID().category][src.dumpID().name][
             dest.dumpID().category][dest.dumpID().name] = []
 
-    def dump_history(self):
+    def dump_history(self) -> None:
+        """
+        Calls every Component's dump_history with their corresponding data stored in self.history.
+        """
         fwdlist = {
             "Sensor": self.sensors,
             "Interpreter": self.interpreters,

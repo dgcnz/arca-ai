@@ -19,10 +19,10 @@ class Audition(Sensor):
         self.FORMAT = pyaudio.paInt16
         self.CHANNELS = 1
         self.SILENCE_FRAMES = 0
-        self.SILENCE_SEC = 1
+        self.SILENCE_SEC = 1.5
         self.IS_NOISE = True
         self.BIAS = 300
-        self.past_window = deque(maxlen=int(self.SILENCE_FRAMES * self.RATE /
+        self.past_window = deque(maxlen=int(self.SILENCE_SEC * self.RATE /
                                             self.CHUNK))
         name, cat = self.dumpID().to_tuple()
         self.logger = get_logger(f"{cat}.{name}",
@@ -110,12 +110,14 @@ class Audition(Sensor):
                 f"RMS Sorted: {rms}\t threshold: {self.THRESHOLD}\t is_valid: True"
             )
             self.SILENCE_FRAMES = 0
+
+            if self.IS_NOISE:
+                past = b''.join(self.past_window)
+                self.past_window.clear()
+                data = past + data
+
             self.IS_NOISE = False
-
-            past = b''.join(self.past_window)
-            self.past_window.clear()
-
-            return past + data
+            return data
         else:
             self.logger.info(
                 f"RMS Sorted: {rms}\t threshold: {self.THRESHOLD}\t is_valid: False"

@@ -19,11 +19,23 @@ class Identifier:
         return self.name, self.category
 
 
-class Entity(ABC):
+class Information:
+    pass
+
+
+class Component(ABC):
+    """
+    Defines general behavior of Sensors, Interpreters, Models and Actuators.
+
+    Attributes:
+        name (str): Self-descriptor
+        destinations_ID: (List[Interpreter]): list of the IDs of possible destinations
+        sendID (Callable): Agent's function/callback to pass a message to another Component given its Identifier
+    """
     def __init__(self, name):
         self.name: str = name
         self.destinations_ID: List[Identifier] = []
-        self.sendID: Callable[[Identifier], None]
+        self.sendID: Callable
 
     def add_destination_ID(self, dest_ID: Identifier):
         self.destinations_ID.append(dest_ID)
@@ -33,12 +45,17 @@ class Entity(ABC):
         return Identifier(self.name, base_class)
 
     @abstractmethod
+    def get_destinations_ID(self, raw_data) -> List[Identifier]:
+        """Given some data, decide destination. Must handle None/empty data."""
+        pass
+
+    @abstractmethod
     def dump_history(self, _id: Identifier, history: List[Any]) -> None:
         pass
 
-
-class Information:
-    pass
+    @abstractmethod
+    def pass_msg(self, msg: str) -> None:
+        pass
 
 
 class Percept(Information):
