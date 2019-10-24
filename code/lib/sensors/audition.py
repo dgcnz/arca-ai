@@ -10,6 +10,20 @@ import wave
 
 
 class Audition(Sensor):
+    """Abstracts microphone.
+
+    Attributes:
+        CHUNK (int): Number of samples.  Set to 4096.
+        RATE (int): The sampling rate. Set to 4800 (Hz).
+        WIDTH (int): Size of the format. Set to 2.
+        FORMAT (type): Set to pyaudio.paInt16.
+        CHANNELS (int): Number of channels the stream read from. Set to 1.
+        SILENCE_SEC (float): Number seconds of silence/noise that will consider before and after not-noise signal. Set to 1.5.
+        SILENCE_FRAMES (int): Helper variable to count number of seconds passed. Defaults to 0.
+        IS_NOISE (bool): True if last read buffer was noise, false otherwise. Defaults to True.
+        BIAS (int): Number that will be subtracted to the calculated threshold in setup_mic(). Set to 300.
+        past_window (deque): container of the past SILENCE_SEC seconds of data.
+        """
     def __init__(self, name: str):
         super().__init__(name, True)
 
@@ -19,19 +33,41 @@ class Audition(Sensor):
         self.FORMAT = pyaudio.paInt16
         self.CHANNELS = 1
         self.SILENCE_FRAMES = 0
-        self.SILENCE_SEC = 1
+        self.SILENCE_SEC = 1.5
         self.IS_NOISE = True
         self.BIAS = 300
-        self.past_window = deque(maxlen=int(self.SILENCE_FRAMES * self.RATE /
+        self.past_window = deque(maxlen=int(self.SILENCE_SEC * self.RATE /
                                             self.CHUNK))
         name, cat = self.dumpID().to_tuple()
         self.logger = get_logger(f"{cat}.{name}",
                                  f"logs/{cat}/{name}/{get_date()}")
 
-    def get_destinations_ID(self, raw_data) -> List[Identifier]:
+    def get_destinations_ID(self, raw_data: Any) -> List[Identifier]:
+        """Decides which destinations to send raw_data.
+        Note:
+            At the moment, it picks the first destination, since there is only one compatible anyway.
+
+        Args:
+            raw_data (Any): data that will determine the relevant destination.
+
+        Returns:
+            List[Identifier]: List of Identifiers of the destinations.
+        """
         return [self.destinations_ID[0]]
 
     def pass_msg(self, msg: str) -> None:
+        """Receives a message.
+
+        Can be of two types:
+            - PAUSE: to call pause()
+            - RESUME: to call resume()
+
+        Args:
+            msg (str): string sent from another Component through the Agent.
+
+        Returns:
+            None
+        """
         if msg == "PAUSE":
             self.pause()
         elif msg == "RESUME":
@@ -39,7 +75,13 @@ class Audition(Sensor):
         else:
             raise Exception("Unrecognized message.")
 
-    def setup_mic(self, seconds=2):
+    def setup_mic(self, seconds: str = 2) -> None:
+        """
+        Sets up a THRESHOLD recording equal to the rms of the 20% largest bytes of a 2-second (default) signal recorded.
+
+        Args:
+            seconds: number of seconds to run the mic setup. Defaults to 2.
+        """
         self.logger.info(
             "Setting up Microphone THRESHOLD. Please say something to adjust its sensitivity."
         )
@@ -65,8 +107,10 @@ class Audition(Sensor):
         p.terminate()
 
     def get_stream(self):
-        """
-        Helper function to open a pyaudio stream.
+        """Helper function to open a pyaudio stream.
+
+        Args:
+            None
 
         Returns:
             stream: instance of pyaudio.Pyaudio.open()
@@ -86,12 +130,16 @@ class Audition(Sensor):
         Reads a self.CHUNK from self.stream and returns it if its rms
         is over self.THRESHOLD. It will maintain self.past_window, a collection
         of the past chunks, and it will append it to the start of the first
-        relevant data it encounters. After relevant data, self.IS_NOISE will
-        still be True and data will be sent normally, but after
-        self.SILENCE_SEC seconds it will send a chunk of empty data and set
-        self.IS_NOISE to True. A chunck of audio is relevant if its rms exceeds
-        the self.THRESHOLD.
+        relevant data it encounters.
 
+        After relevant data, self.IS_NOISE will still be True and data will be
+        sent normally, but after self.SILENCE_SEC seconds it will send a chunk
+        of empty data and set self.IS_NOISE to True.
+
+        A chunk of audio is relevant if its rms exceeds the self.THRESHOLD.
+
+        Args:
+            None
 
         Returns:
            Any: data or None
@@ -110,12 +158,14 @@ class Audition(Sensor):
                 f"RMS Sorted: {rms}\t threshold: {self.THRESHOLD}\t is_valid: True"
             )
             self.SILENCE_FRAMES = 0
+
+            if self.IS_NOISE:
+                past = b''.join(self.past_window)
+                self.past_window.clear()
+                data = past + data
+
             self.IS_NOISE = False
-
-            past = b''.join(self.past_window)
-            self.past_window.clear()
-
-            return past + data
+            return data
         else:
             self.logger.info(
                 f"RMS Sorted: {rms}\t threshold: {self.THRESHOLD}\t is_valid: False"

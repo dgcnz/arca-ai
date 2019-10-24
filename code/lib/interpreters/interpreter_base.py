@@ -1,4 +1,4 @@
-from lib.types import Interpretation, Identifier, Entity, Information
+from lib.types import Interpretation, Identifier, Component, Information
 from typing import List, Generator, Any
 from abc import ABC, abstractmethod
 from queue import Queue
@@ -14,11 +14,11 @@ def threaded(fx):
     return wrapper
 
 
-class Interpreter(Entity, ABC):
+class Interpreter(Component, ABC):
     """Interpreter parent class.
 
     Attributes:
-        name: A string that serves as an identifier for the Entity.
+        name: A string that serves as an identifier for the Component.
         waitable: A boolean that indicates if the instance will have to wait
             for the answer of the forward connection.
     """
@@ -32,7 +32,7 @@ class Interpreter(Entity, ABC):
         """External method that serves to put data to the percept queue."""
         self.queue.put(data)
 
-    def send(self, raw_data):
+    def send(self, raw_data: Any):
         """
         Decides destination given raw_data and calls Agent\'s sendID() to send
         such information to such destination.
@@ -67,11 +67,6 @@ class Interpreter(Entity, ABC):
                     self.queue.queue.clear()
 
     @abstractmethod
-    def get_destinations_ID(self, raw_data) -> List[Identifier]:
-        """Given some data, decide destination. Must handle None/empty data."""
-        pass
-
-    @abstractmethod
     def preprocess(self, raw_data: Any) -> Any:
         """Given some raw_data, remove noise or add some useful metadata.
 
@@ -88,12 +83,7 @@ class Interpreter(Entity, ABC):
         of such significant perception.
 
         Yields:
-            bool: Indicates the sensor if it should stop (True)
-                or continue listening (False).
+            bool: Indicates the sensor if it should stop (True) or continue listening (False).
             Any: Preprocessed data (if bool was True)
         """
-        pass
-
-    @abstractmethod
-    def pass_msg(self, msg: str) -> None:
         pass

@@ -1,9 +1,9 @@
 from typing import List, Any
 from abc import ABC, abstractmethod
-from lib.types import Action, Entity, Identifier, Information, Interpretation
+from lib.types import Action, Component, Identifier, Information, Interpretation
 
 
-class Model(Entity, ABC):
+class Model(Component, ABC):
     def __init__(self, name: str):
         super().__init__(name)
 
@@ -17,14 +17,5 @@ class Model(Entity, ABC):
             self.send(raw_action)
 
     @abstractmethod
-    def get_destinations_ID(self, raw_data) -> List[Identifier]:
-        """Given some data, decide destination. Must handle None/empty data."""
-        pass
-
-    @abstractmethod
     def decide(self, data: Interpretation) -> List[Any]:
-        pass
-
-    @abstractmethod
-    def pass_msg(self, msg: str) -> None:
         pass

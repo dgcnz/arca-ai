@@ -1,4 +1,4 @@
-from lib.types import Percept, Status, Entity, Identifier
+from lib.types import Percept, Status, Component, Identifier
 from abc import ABC, abstractmethod
 from threading import Thread, Event
 from typing import List, Any
@@ -6,18 +6,25 @@ from typing import List, Any
 TIMEOUT = 1.0
 
 
-class Sensor(Entity, ABC):
+class Sensor(Component, ABC):
+    """Class to generalize Sensors.
+
+    Attributes:
+        __perceiver (Thread): Thread that runs self.perceiver()
+        waitable (bool): True if Sensor will wait for destination to signal to pause or continue
+        wait_event: Event that will be evaluated in self.perceiver if waitable is true. Given that case, it will be set on or off if `resume()` or `pause()` functions are called.
+
+    """
     def __init__(self, name: str, waitable: bool):
         super().__init__(name)
         self.__perceiver = Thread(target=self.perceiver)
+        self.waitable = waitable
         self.wait_event = Event()
         self.status = Status.STOPPED
-        self.waitable = waitable
 
     def on(self) -> None:
         """
-        Sets wait_event to allow processing and
-        starts sense function in another thread.
+        Sets wait_event to allow processing and starts sense function in another thread.
         """
         self.status = Status.RUNNING
         self.wait_event.set()
@@ -26,8 +33,7 @@ class Sensor(Entity, ABC):
 
     def off(self) -> None:
         """
-        Sets wait_event to allow processing and
-        starts sense function in another thread.
+        Sets status to STOPPED and waits for the __perceiver Thread to join.
         """
         self.status = Status.STOPPED
         self.__perceiver.join(timeout=TIMEOUT)
@@ -65,14 +71,6 @@ class Sensor(Entity, ABC):
             if data is not None:
                 self.send(data)
         self.close_perceiver()
-
-    @abstractmethod
-    def get_destinations_ID(self, raw_data) -> List[Identifier]:
-        pass
-
-    @abstractmethod
-    def pass_msg(self, msg: str) -> None:
-        pass
 
     @abstractmethod
     def read_input(self) -> Any:

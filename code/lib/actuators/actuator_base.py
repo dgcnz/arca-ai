@@ -1,8 +1,8 @@
-from lib.types import Action, Entity
+from lib.types import Action, Component
 from abc import ABC, abstractmethod
 
 
-class Actuator(Entity, ABC):
+class Actuator(Component, ABC):
     def __init__(self, name):
         super().__init__(name)
 
@@ -11,8 +11,4 @@ class Actuator(Entity, ABC):
 
     @abstractmethod
     def do(self, action: Action) -> None:
-        pass
-
-    @abstractmethod
-    def pass_msg(self, msg: str) -> None:
         pass
