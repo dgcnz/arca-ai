@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Welcome to ARCA’s documentation! &mdash; ARCA  documentation</title>
+  <title>An Overview &mdash; ARCA  documentation</title>
   
 
   
@@ -81,9 +81,9 @@
             
                 <!-- Local TOC -->
                 <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">Welcome to ARCA’s documentation!</a></li>
-<li><a class="reference internal" href="#module-lib.ai">ARCA-AI Agent</a></li>
-<li><a class="reference internal" href="#module-lib.types">Types</a></li>
+<li><a class="reference internal" href="#">An Overview</a></li>
+<li><a class="reference internal" href="#agent">Agent</a></li>
+<li><a class="reference internal" href="#types">Types</a></li>
 <li><a class="reference internal" href="#module-lib.sensors.sensor_base">Sensor</a></li>
 <li><a class="reference internal" href="#module-lib.interpreters.interpreter_base">Interpreter</a></li>
 <li><a class="reference internal" href="#module-lib.models.model_base">Model</a></li>
@@ -135,7 +135,7 @@
     
       <li><a href="#">Docs</a> &raquo;</li>
         
-      <li>Welcome to ARCA’s documentation!</li>
+      <li>An Overview</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -154,14 +154,21 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="welcome-to-arca-s-documentation">
-<h1>Welcome to ARCA’s documentation!<a class="headerlink" href="#welcome-to-arca-s-documentation" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="an-overview">
+<h1>An Overview<a class="headerlink" href="#an-overview" title="Permalink to this headline">¶</a></h1>
+<p>One of the main objectives of this project was to devise a way to organize and segment the code such that it made sense 1) <em>conceptually</em> and 2) <em>programatically</em>.</p>
+<p>For the first condition, such architecture was and had to be inspired by what we knew or the intuition we had from the workings of the brain. We’re not claiming, by any means, that such an ambition was reached, but that it exercised the thought of this matter.</p>
+<p>For the latter, it had to be implementable, obviously, but also maintainable and even efficient. Threading, Events, Message Passing and other techniques were used to achieve these goals in a modular fashion. Class Inheritance allowed the immediate interfaces (i.e. the Audition sensor) to be fairly simple and restrained to their unique properties while hiding the aforementioned details (Threading, etc.) in the parent classes (i.e. the Sensor base class). On top of that, the Agent class encompassed a collection of Sensors, Interpreters, Models and Actuators (we’ll call the Components) and allowed non-redundant and centralized message passing between them (this aided debugging too).</p>
+<p>In the following picture, the path of Information is shown.</p>
+<img alt="_images/infopath.png" src="_images/infopath.png" />
+<p>The basic idea is that Sensors read Percepts from the external world (via hardware) and pass them to the Interpreters so that they can transform them into something that is “usable”. Sensors should not make any preprocessing or complex decisions about the raw data. Interpreters, on the other hand, have to receive Percepts (or Interpretations) continuously, decide when such sequence is a relevant unit of perception, process it and send it to another Interpreter if it still needs to be decoded or to a Model if it’s ready to be transformed to an Action. Models take Interpretations and decide what to do with such information, returning if necessary a sequence of Actions.</p>
 <div class="toctree-wrapper compound">
 </div>
 </div>
-<div class="section" id="module-lib.ai">
-<span id="arca-ai-agent"></span><h1>ARCA-AI Agent<a class="headerlink" href="#module-lib.ai" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<div class="section" id="agent">
+<h1>Agent<a class="headerlink" href="#agent" title="Permalink to this headline">¶</a></h1>
+<p>The Agent class serves to englobe, centralize and simplify inter-component communication to ensure its validity. It also provides a comprehensive and unified interface that Observers can use to query and interact with Agent’s components and Developers can use to easily set up a component network for their AI.</p>
+<span class="target" id="module-lib.ai"></span><dl class="class">
 <dt id="lib.ai.Agent">
 <em class="property">class </em><code class="sig-prename descclassname">lib.ai.</code><code class="sig-name descname">Agent</code><span class="sig-paren">(</span><em class="sig-param">name: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/ai.html#Agent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.ai.Agent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class to generalize Agents.</p>
@@ -304,9 +311,10 @@
 </dd></dl>
 
 </div>
-<div class="section" id="module-lib.types">
-<span id="types"></span><h1>Types<a class="headerlink" href="#module-lib.types" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<div class="section" id="types">
+<h1>Types<a class="headerlink" href="#types" title="Permalink to this headline">¶</a></h1>
+<p>An <cite>Entity</cite> is a class that defines the general behavior of Sensors, Interpreters, Models and Actuators. It implements two simple methods (<cite>add_destination_ID()</cite> and <cite>dumpID()</cite>), defines an abstract function <cite>dump_history()</cite> and “declares” three variables (<cite>name</cite>, <cite>destinations_ID</cite>, <cite>sendID</cite>).</p>
+<span class="target" id="module-lib.types"></span><dl class="class">
 <dt id="lib.types.Component">
 <em class="property">class </em><code class="sig-prename descclassname">lib.types.</code><code class="sig-name descname">Component</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/types.html#Component"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.types.Component" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines general behavior of Sensors, Interpreters, Models and Actuators.</p>
