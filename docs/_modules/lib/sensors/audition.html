@@ -1,0 +1,408 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>lib.sensors.audition &mdash; ARCA  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="ARCA  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> ARCA
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <!-- Local TOC -->
+                <div class="local-toc"></div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">ARCA</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>lib.sensors.audition</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for lib.sensors.audition</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">lib.sensors.sensor_base</span> <span class="k">import</span> <span class="n">Sensor</span>
+<span class="kn">from</span> <span class="nn">lib.types</span> <span class="k">import</span> <span class="n">Identifier</span>
+<span class="kn">from</span> <span class="nn">lib.utilities.helpers</span> <span class="k">import</span> <span class="n">bytes_to_np</span><span class="p">,</span> <span class="n">np_to_bytes</span><span class="p">,</span> <span class="n">get_logger</span><span class="p">,</span> <span class="n">get_date</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">deque</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pyaudio</span>
+<span class="kn">import</span> <span class="nn">audioop</span>
+<span class="kn">import</span> <span class="nn">wave</span>
+
+
+<div class="viewcode-block" id="Audition"><a class="viewcode-back" href="../../../index.html#lib.sensors.audition.Audition">[docs]</a><span class="k">class</span> <span class="nc">Audition</span><span class="p">(</span><span class="n">Sensor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Abstracts microphone.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        CHUNK (int): Number of samples.  Set to 4096.</span>
+<span class="sd">        RATE (int): The sampling rate. Set to 4800 (Hz).</span>
+<span class="sd">        WIDTH (int): Size of the format. Set to 2.</span>
+<span class="sd">        FORMAT (type): Set to pyaudio.paInt16.</span>
+<span class="sd">        CHANNELS (int): Number of channels the stream read from. Set to 1.</span>
+<span class="sd">        SILENCE_SEC (float): Number seconds of silence/noise that will consider before and after not-noise signal. Set to 1.5.</span>
+<span class="sd">        SILENCE_FRAMES (int): Helper variable to count number of seconds passed. Defaults to 0.</span>
+<span class="sd">        IS_NOISE (bool): True if last read buffer was noise, false otherwise. Defaults to True.</span>
+<span class="sd">        BIAS (int): Number that will be subtracted to the calculated threshold in setup_mic(). Set to 300.</span>
+<span class="sd">        past_window (deque): container of the past SILENCE_SEC seconds of data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">CHUNK</span> <span class="o">=</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">4</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">RATE</span> <span class="o">=</span> <span class="mi">48000</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">WIDTH</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">FORMAT</span> <span class="o">=</span> <span class="n">pyaudio</span><span class="o">.</span><span class="n">paInt16</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">CHANNELS</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SILENCE_FRAMES</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SILENCE_SEC</span> <span class="o">=</span> <span class="mf">1.5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">IS_NOISE</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">BIAS</span> <span class="o">=</span> <span class="mi">300</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">past_window</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SILENCE_SEC</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">RATE</span> <span class="o">/</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">CHUNK</span><span class="p">))</span>
+        <span class="n">name</span><span class="p">,</span> <span class="n">cat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dumpID</span><span class="p">()</span><span class="o">.</span><span class="n">to_tuple</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{cat}</span><span class="s2">.</span><span class="si">{name}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                 <span class="n">f</span><span class="s2">&quot;logs/</span><span class="si">{cat}</span><span class="s2">/</span><span class="si">{name}</span><span class="s2">/{get_date()}&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Audition.get_destinations_ID"><a class="viewcode-back" href="../../../index.html#lib.sensors.audition.Audition.get_destinations_ID">[docs]</a>    <span class="k">def</span> <span class="nf">get_destinations_ID</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_data</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Identifier</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Decides which destinations to send raw_data.</span>
+<span class="sd">        Note:</span>
+<span class="sd">            At the moment, it picks the first destination, since there is only one compatible anyway.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            raw_data (Any): data that will determine the relevant destination.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List[Identifier]: List of Identifiers of the destinations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">destinations_ID</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span></div>
+
+<div class="viewcode-block" id="Audition.pass_msg"><a class="viewcode-back" href="../../../index.html#lib.sensors.audition.Audition.pass_msg">[docs]</a>    <span class="k">def</span> <span class="nf">pass_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Receives a message.</span>
+
+<span class="sd">        Can be of two types:</span>
+<span class="sd">            - PAUSE: to call pause()</span>
+<span class="sd">            - RESUME: to call resume()</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            msg (str): string sent from another Component through the Agent.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">msg</span> <span class="o">==</span> <span class="s2">&quot;PAUSE&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pause</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">msg</span> <span class="o">==</span> <span class="s2">&quot;RESUME&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resume</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unrecognized message.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Audition.setup_mic"><a class="viewcode-back" href="../../../index.html#lib.sensors.audition.Audition.setup_mic">[docs]</a>    <span class="k">def</span> <span class="nf">setup_mic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seconds</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets up a THRESHOLD recording equal to the rms of the 20% largest bytes of a 2-second (default) signal recorded.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            seconds: number of seconds to run the mic setup. Defaults to 2.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Setting up Microphone THRESHOLD. Please say something to adjust its sensitivity.&quot;</span>
+        <span class="p">)</span>
+        <span class="n">stream</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_stream</span><span class="p">()</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">num_samples</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">RATE</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">CHUNK</span> <span class="o">*</span> <span class="n">seconds</span><span class="p">)</span>
+
+        <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Press Enter when ready.&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_samples</span><span class="p">):</span>
+            <span class="n">rms</span> <span class="o">=</span> <span class="n">audioop</span><span class="o">.</span><span class="n">rms</span><span class="p">(</span>
+                <span class="n">stream</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CHUNK</span><span class="p">,</span> <span class="n">exception_on_overflow</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">WIDTH</span><span class="p">)</span>
+            <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rms</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;RMS: </span><span class="si">{rms:&lt;5}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">values</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">THRESHOLD</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">values</span><span class="p">[:</span><span class="nb">int</span><span class="p">(</span><span class="n">num_samples</span> <span class="o">*</span> <span class="mf">0.2</span><span class="p">)])</span> <span class="o">/</span> <span class="nb">int</span><span class="p">(</span>
+            <span class="n">num_samples</span> <span class="o">*</span> <span class="mf">0.2</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">BIAS</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Threshold set at </span><span class="si">{self.THRESHOLD}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="n">stream</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Audition.get_stream"><a class="viewcode-back" href="../../../index.html#lib.sensors.audition.Audition.get_stream">[docs]</a>    <span class="k">def</span> <span class="nf">get_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper function to open a pyaudio stream.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            stream: instance of pyaudio.Pyaudio.open()</span>
+<span class="sd">            p: instance of pyaudio.Pyaudio</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">pyaudio</span><span class="o">.</span><span class="n">PyAudio</span><span class="p">()</span>
+        <span class="n">stream</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">FORMAT</span><span class="p">,</span>
+                        <span class="n">channels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">CHANNELS</span><span class="p">,</span>
+                        <span class="n">rate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">RATE</span><span class="p">,</span>
+                        <span class="nb">input</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">frames_per_buffer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">CHUNK</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">stream</span><span class="p">,</span> <span class="n">p</span></div>
+
+<div class="viewcode-block" id="Audition.read_input"><a class="viewcode-back" href="../../../index.html#lib.sensors.audition.Audition.read_input">[docs]</a>    <span class="k">def</span> <span class="nf">read_input</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads a self.CHUNK from self.stream and returns it if its rms</span>
+<span class="sd">        is over self.THRESHOLD. It will maintain self.past_window, a collection</span>
+<span class="sd">        of the past chunks, and it will append it to the start of the first</span>
+<span class="sd">        relevant data it encounters.</span>
+
+<span class="sd">        After relevant data, self.IS_NOISE will still be True and data will be</span>
+<span class="sd">        sent normally, but after self.SILENCE_SEC seconds it will send a chunk</span>
+<span class="sd">        of empty data and set self.IS_NOISE to True.</span>
+
+<span class="sd">        A chunk of audio is relevant if its rms exceeds the self.THRESHOLD.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">           Any: data or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Reads from pyaudio.stream</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stream</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CHUNK</span><span class="p">,</span> <span class="n">exception_on_overflow</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1"># Takes 0.2 biggest values</span>
+        <span class="n">data_np</span> <span class="o">=</span> <span class="n">bytes_to_np</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">data_np</span> <span class="o">=</span> <span class="n">np_to_bytes</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">data_np</span><span class="p">)[</span><span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="mf">0.2</span> <span class="o">*</span> <span class="n">data_np</span><span class="o">.</span><span class="n">size</span><span class="p">):])</span>
+        <span class="c1"># Calculates rms of sorted and sliced bytearray</span>
+        <span class="n">rms</span> <span class="o">=</span> <span class="n">audioop</span><span class="o">.</span><span class="n">rms</span><span class="p">(</span><span class="n">data_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">WIDTH</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">data</span> <span class="o">!=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span> <span class="ow">and</span> <span class="n">rms</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">THRESHOLD</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="n">f</span><span class="s2">&quot;RMS Sorted: </span><span class="si">{rms}</span><span class="se">\t</span><span class="s2"> threshold: </span><span class="si">{self.THRESHOLD}</span><span class="se">\t</span><span class="s2"> is_valid: True&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">SILENCE_FRAMES</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">IS_NOISE</span><span class="p">:</span>
+                <span class="n">past</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">past_window</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">past_window</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">past</span> <span class="o">+</span> <span class="n">data</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">IS_NOISE</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="n">data</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="n">f</span><span class="s2">&quot;RMS Sorted: </span><span class="si">{rms}</span><span class="se">\t</span><span class="s2"> threshold: </span><span class="si">{self.THRESHOLD}</span><span class="se">\t</span><span class="s2"> is_valid: False&quot;</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">past_window</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">IS_NOISE</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">SILENCE_FRAMES</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SILENCE_FRAMES</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">CHUNK</span> <span class="o">/</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">RATE</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SILENCE_SEC</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">IS_NOISE</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">return</span> <span class="nb">bytes</span><span class="p">([</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">CHUNK</span> <span class="o">*</span> <span class="mi">4</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">data</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+    <span class="k">def</span> <span class="nf">setup_perceiver</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_mic</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__stream</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_stream</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">close_perceiver</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__stream</span><span class="o">.</span><span class="n">stop_stream</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__stream</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__p</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">dump_history</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Dumping history into </span><span class="si">{filename}</span><span class="s2">.wav.&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">wave</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{filename}</span><span class="s2">.wav&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">waveFile</span><span class="p">:</span>
+            <span class="n">waveFile</span><span class="o">.</span><span class="n">setnchannels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CHANNELS</span><span class="p">)</span>
+            <span class="n">waveFile</span><span class="o">.</span><span class="n">setsampwidth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">WIDTH</span><span class="p">)</span>
+            <span class="n">waveFile</span><span class="o">.</span><span class="n">setframerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">RATE</span><span class="p">)</span>
+            <span class="n">waveFile</span><span class="o">.</span><span class="n">writeframes</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data</span><span class="p">))</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, dgcnz.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> and ❤️  using a custom <a href="https://github.com/LinxiFan/Sphinx-theme">theme</a> based on <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../../_static/language_data.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

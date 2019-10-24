@@ -1,0 +1,345 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>lib.ai &mdash; ARCA  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="ARCA  documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> ARCA
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <!-- Local TOC -->
+                <div class="local-toc"></div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ARCA</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>lib.ai</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for lib.ai</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">lib.types</span> <span class="k">import</span> <span class="n">Component</span><span class="p">,</span> <span class="n">Information</span><span class="p">,</span> <span class="n">Identifier</span><span class="p">,</span> <span class="n">NestedDefaultDict</span>
+<span class="kn">from</span> <span class="nn">lib.sensors.sensor_base</span> <span class="k">import</span> <span class="n">Sensor</span>
+<span class="kn">from</span> <span class="nn">lib.interpreters.interpreter_base</span> <span class="k">import</span> <span class="n">Interpreter</span>
+<span class="kn">from</span> <span class="nn">lib.models.model_base</span> <span class="k">import</span> <span class="n">Model</span>
+<span class="kn">from</span> <span class="nn">lib.actuators.actuator_base</span> <span class="k">import</span> <span class="n">Actuator</span>
+<span class="kn">from</span> <span class="nn">lib.observers.observer_base</span> <span class="k">import</span> <span class="n">Subject</span><span class="p">,</span> <span class="n">Observer</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">lib.utilities.helpers</span> <span class="k">import</span> <span class="n">create_path</span><span class="p">,</span> <span class="n">get_date</span><span class="p">,</span> <span class="n">get_logger</span>
+<span class="kn">import</span> <span class="nn">pprint</span>
+<span class="n">pp</span> <span class="o">=</span> <span class="n">pprint</span><span class="o">.</span><span class="n">PrettyPrinter</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Agent"><a class="viewcode-back" href="../../index.html#lib.ai.Agent">[docs]</a><span class="k">class</span> <span class="nc">Agent</span><span class="p">(</span><span class="n">Subject</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class to generalize Agents.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        name (str): name of the agent</span>
+<span class="sd">        actuators (Dict[str, Actuator]): collection of Actuators</span>
+<span class="sd">        sensors (Dict[str, Sensor]): collection of Sensors</span>
+<span class="sd">        interpreters (Dict[str, Interpreter]): collection of Interpreters</span>
+<span class="sd">        models (Dict[str, Model]): collection of Models</span>
+<span class="sd">        observers (List[Observer]): collection of Observers (DP)</span>
+<span class="sd">        history (NestedDefaultDict): Stores messages from source Component to destination Component in structure `src.category/src.name/dest.category/dest.name`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">actuators</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Actuator</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">sensors</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sensor</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">interpreters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Interpreter</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">models</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Model</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">observers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Observer</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">history</span> <span class="o">=</span> <span class="n">NestedDefaultDict</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{name}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">f</span><span class="s2">&quot;logs/Agent/</span><span class="si">{name}</span><span class="s2">/{get_date()}&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Agent.shutdown"><a class="viewcode-back" href="../../index.html#lib.ai.Agent.shutdown">[docs]</a>    <span class="k">def</span> <span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Dumps history and shuts off every sensor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Shutting down </span><span class="si">{self.name}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dump_history</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">s_name</span><span class="p">,</span> <span class="n">sensor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sensors</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">sensor</span><span class="o">.</span><span class="n">off</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Done.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Agent.add_component"><a class="viewcode-back" href="../../index.html#lib.ai.Agent.add_component">[docs]</a>    <span class="k">def</span> <span class="nf">add_component</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span> <span class="n">Component</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes a component and appends it to its corresponding collection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fwdlist</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;Sensor&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">sensors</span><span class="p">,</span>
+            <span class="s2">&quot;Interpreter&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpreters</span><span class="p">,</span>
+            <span class="s2">&quot;Model&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">,</span>
+            <span class="s2">&quot;Actuator&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">actuators</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="n">f</span><span class="s2">&quot;Adding Component {e.dumpID().category}:{e.dumpID().name}.&quot;</span><span class="p">)</span>
+        <span class="n">fwdlist</span><span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">dumpID</span><span class="p">()</span><span class="o">.</span><span class="n">category</span><span class="p">][</span><span class="n">e</span><span class="o">.</span><span class="n">dumpID</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">e</span></div>
+
+<div class="viewcode-block" id="Agent.attach_observer"><a class="viewcode-back" href="../../index.html#lib.ai.Agent.attach_observer">[docs]</a>    <span class="k">def</span> <span class="nf">attach_observer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observer</span><span class="p">:</span> <span class="n">Observer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">observers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">observer</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Agent.detach_observer"><a class="viewcode-back" href="../../index.html#lib.ai.Agent.detach_observer">[docs]</a>    <span class="k">def</span> <span class="nf">detach_observer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observer</span><span class="p">:</span> <span class="n">Observer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">observers</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">observer</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Agent.notify_observers"><a class="viewcode-back" href="../../index.html#lib.ai.Agent.notify_observers">[docs]</a>    <span class="k">def</span> <span class="nf">notify_observers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">observers</span><span class="p">:</span>
+            <span class="n">obs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Agent.sendID"><a class="viewcode-back" href="../../index.html#lib.ai.Agent.sendID">[docs]</a>    <span class="k">def</span> <span class="nf">sendID</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">msg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Information</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+               <span class="n">rcv</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Component</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Callback function that is executed in an Component to pass a msg (can be Information or just a string) to another Component.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            msg (Union[Information, str]): message can be a Percept, Interpretation, Action or string.</span>
+<span class="sd">            rcv (Optional[Component]): receiver might be optional, since Information already contains such data.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">fwdlist</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;Sensor&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">sensors</span><span class="p">,</span>
+            <span class="s2">&quot;Interpreter&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpreters</span><span class="p">,</span>
+            <span class="s2">&quot;Model&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">,</span>
+            <span class="s2">&quot;Actuator&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">actuators</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">Information</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="n">f</span><span class="s2">&quot;Information is passed from </span><span class="si">{msg.src.name}</span><span class="s2"> to </span><span class="si">{msg.dest.name}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+            <span class="n">fwdlist</span><span class="p">[</span><span class="n">msg</span><span class="o">.</span><span class="n">dest</span><span class="o">.</span><span class="n">category</span><span class="p">][</span><span class="n">msg</span><span class="o">.</span><span class="n">dest</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="n">msg</span><span class="o">.</span><span class="n">src</span><span class="o">.</span><span class="n">category</span><span class="p">][</span><span class="n">msg</span><span class="o">.</span><span class="n">src</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="n">msg</span><span class="o">.</span><span class="n">dest</span><span class="o">.</span><span class="n">category</span><span class="p">][</span>
+                <span class="n">msg</span><span class="o">.</span><span class="n">dest</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">rcv</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                    <span class="s2">&quot;If message is a string, a receiver must be specified.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;MESSAGE </span><span class="si">{msg}</span><span class="s2"> was passed to </span><span class="si">{rcv.name}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="n">fwdlist</span><span class="p">[</span><span class="n">rcv</span><span class="o">.</span><span class="n">category</span><span class="p">][</span><span class="n">rcv</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">pass_msg</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Agent.associate"><a class="viewcode-back" href="../../index.html#lib.ai.Agent.associate">[docs]</a>    <span class="k">def</span> <span class="nf">associate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src</span><span class="p">:</span> <span class="n">Component</span><span class="p">,</span> <span class="n">dest</span><span class="p">:</span> <span class="n">Component</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds dest destination to src Component and defines src&#39;s sendID() with Agent&#39;s sendID().</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="n">f</span><span class="s2">&quot;Associating {src.dumpID().category}:{src.dumpID().name} with {dest.dumpID().category}:{dest.dumpID().name}&quot;</span>
+        <span class="p">)</span>
+        <span class="n">src</span><span class="o">.</span><span class="n">add_destination_ID</span><span class="p">(</span><span class="n">dest</span><span class="o">.</span><span class="n">dumpID</span><span class="p">())</span>
+        <span class="n">src</span><span class="o">.</span><span class="n">sendID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sendID</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="n">src</span><span class="o">.</span><span class="n">dumpID</span><span class="p">()</span><span class="o">.</span><span class="n">category</span><span class="p">][</span><span class="n">src</span><span class="o">.</span><span class="n">dumpID</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">][</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">dumpID</span><span class="p">()</span><span class="o">.</span><span class="n">category</span><span class="p">][</span><span class="n">dest</span><span class="o">.</span><span class="n">dumpID</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="Agent.dump_history"><a class="viewcode-back" href="../../index.html#lib.ai.Agent.dump_history">[docs]</a>    <span class="k">def</span> <span class="nf">dump_history</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calls every Component&#39;s dump_history with their corresponding data stored in self.history.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fwdlist</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;Sensor&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">sensors</span><span class="p">,</span>
+            <span class="s2">&quot;Interpreter&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpreters</span><span class="p">,</span>
+            <span class="s2">&quot;Model&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">,</span>
+            <span class="s2">&quot;Actuator&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">actuators</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">src_cat</span><span class="p">,</span> <span class="n">src_catv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">src_name</span><span class="p">,</span> <span class="n">src_namev</span> <span class="ow">in</span> <span class="n">src_catv</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">dest_cat</span><span class="p">,</span> <span class="n">dest_catv</span> <span class="ow">in</span> <span class="n">src_namev</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">for</span> <span class="n">dest_name</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">dest_catv</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="n">path</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;logs/</span><span class="si">{src_cat}</span><span class="s2">/</span><span class="si">{src_name}</span><span class="s2">/</span><span class="si">{dest_cat}</span><span class="s2">/</span><span class="si">{dest_name}</span><span class="s2">&quot;</span>
+                        <span class="n">create_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                        <span class="n">timestamp</span> <span class="o">=</span> <span class="n">get_date</span><span class="p">()</span>
+                        <span class="n">fwdlist</span><span class="p">[</span><span class="n">src_cat</span><span class="p">][</span><span class="n">src_name</span><span class="p">]</span><span class="o">.</span><span class="n">dump_history</span><span class="p">(</span>
+                            <span class="n">f</span><span class="s2">&quot;</span><span class="si">{path}</span><span class="s2">/</span><span class="si">{timestamp}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, dgcnz.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> and ❤️  using a custom <a href="https://github.com/LinxiFan/Sphinx-theme">theme</a> based on <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../_static/language_data.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

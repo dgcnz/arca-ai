@@ -1,0 +1,815 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Welcome to ARCA’s documentation! &mdash; ARCA  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="ARCA  documentation" href="#"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="#" class="icon icon-home"> ARCA
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <!-- Local TOC -->
+                <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Welcome to ARCA’s documentation!</a></li>
+<li><a class="reference internal" href="#module-lib.ai">ARCA-AI Agent</a></li>
+<li><a class="reference internal" href="#module-lib.types">Types</a></li>
+<li><a class="reference internal" href="#module-lib.sensors.sensor_base">Sensor</a></li>
+<li><a class="reference internal" href="#module-lib.interpreters.interpreter_base">Interpreter</a></li>
+<li><a class="reference internal" href="#module-lib.models.model_base">Model</a></li>
+<li><a class="reference internal" href="#module-lib.actuators.actuator_base">Actuator</a></li>
+<li><a class="reference internal" href="#module-lib.sensors.audition">Audition Sensor</a></li>
+<li><a class="reference internal" href="#speech-recognizer-interpreter">Speech Recognizer Interpreter</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">ARCA</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#">Docs</a> &raquo;</li>
+        
+      <li>Welcome to ARCA’s documentation!</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="welcome-to-arca-s-documentation">
+<h1>Welcome to ARCA’s documentation!<a class="headerlink" href="#welcome-to-arca-s-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+<div class="section" id="module-lib.ai">
+<span id="arca-ai-agent"></span><h1>ARCA-AI Agent<a class="headerlink" href="#module-lib.ai" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="lib.ai.Agent">
+<em class="property">class </em><code class="sig-prename descclassname">lib.ai.</code><code class="sig-name descname">Agent</code><span class="sig-paren">(</span><em class="sig-param">name: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/ai.html#Agent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.ai.Agent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to generalize Agents.</p>
+<dl class="attribute">
+<dt id="lib.ai.Agent.name">
+<code class="sig-name descname">name</code><a class="headerlink" href="#lib.ai.Agent.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>name of the agent</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lib.ai.Agent.actuators">
+<code class="sig-name descname">actuators</code><a class="headerlink" href="#lib.ai.Agent.actuators" title="Permalink to this definition">¶</a></dt>
+<dd><p>collection of Actuators</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Dict[str, <a class="reference internal" href="#lib.actuators.actuator_base.Actuator" title="lib.actuators.actuator_base.Actuator">Actuator</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lib.ai.Agent.sensors">
+<code class="sig-name descname">sensors</code><a class="headerlink" href="#lib.ai.Agent.sensors" title="Permalink to this definition">¶</a></dt>
+<dd><p>collection of Sensors</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Dict[str, <a class="reference internal" href="#lib.sensors.sensor_base.Sensor" title="lib.sensors.sensor_base.Sensor">Sensor</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lib.ai.Agent.interpreters">
+<code class="sig-name descname">interpreters</code><a class="headerlink" href="#lib.ai.Agent.interpreters" title="Permalink to this definition">¶</a></dt>
+<dd><p>collection of Interpreters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Dict[str, <a class="reference internal" href="#lib.interpreters.interpreter_base.Interpreter" title="lib.interpreters.interpreter_base.Interpreter">Interpreter</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lib.ai.Agent.models">
+<code class="sig-name descname">models</code><a class="headerlink" href="#lib.ai.Agent.models" title="Permalink to this definition">¶</a></dt>
+<dd><p>collection of Models</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Dict[str, <a class="reference internal" href="#lib.models.model_base.Model" title="lib.models.model_base.Model">Model</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lib.ai.Agent.observers">
+<code class="sig-name descname">observers</code><a class="headerlink" href="#lib.ai.Agent.observers" title="Permalink to this definition">¶</a></dt>
+<dd><p>collection of Observers (DP)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>List[Observer]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lib.ai.Agent.history">
+<code class="sig-name descname">history</code><a class="headerlink" href="#lib.ai.Agent.history" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stores messages from source Component to destination Component in structure <cite>src.category/src.name/dest.category/dest.name</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lib.types.NestedDefaultDict" title="lib.types.NestedDefaultDict">NestedDefaultDict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lib.ai.Agent.add_component">
+<code class="sig-name descname">add_component</code><span class="sig-paren">(</span><em class="sig-param">e: lib.types.Component</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/lib/ai.html#Agent.add_component"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.ai.Agent.add_component" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a component and appends it to its corresponding collection.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lib.ai.Agent.associate">
+<code class="sig-name descname">associate</code><span class="sig-paren">(</span><em class="sig-param">src: lib.types.Component</em>, <em class="sig-param">dest: lib.types.Component</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/lib/ai.html#Agent.associate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.ai.Agent.associate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds dest destination to src Component and defines src’s sendID() with Agent’s sendID().</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lib.ai.Agent.attach_observer">
+<code class="sig-name descname">attach_observer</code><span class="sig-paren">(</span><em class="sig-param">observer: lib.observers.observer_base.Observer</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/lib/ai.html#Agent.attach_observer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.ai.Agent.attach_observer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attach an observer to the subject.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lib.ai.Agent.detach_observer">
+<code class="sig-name descname">detach_observer</code><span class="sig-paren">(</span><em class="sig-param">observer: lib.observers.observer_base.Observer</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/lib/ai.html#Agent.detach_observer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.ai.Agent.detach_observer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Detach an observer from the subject.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lib.ai.Agent.dump_history">
+<code class="sig-name descname">dump_history</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/lib/ai.html#Agent.dump_history"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.ai.Agent.dump_history" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls every Component’s dump_history with their corresponding data stored in self.history.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lib.ai.Agent.notify_observers">
+<code class="sig-name descname">notify_observers</code><span class="sig-paren">(</span><em class="sig-param">keyword: str</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/lib/ai.html#Agent.notify_observers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.ai.Agent.notify_observers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Notify all observers about an event.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lib.ai.Agent.sendID">
+<code class="sig-name descname">sendID</code><span class="sig-paren">(</span><em class="sig-param">msg: Union[lib.types.Information, str], rcv: Optional[lib.types.Component] = None</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/lib/ai.html#Agent.sendID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.ai.Agent.sendID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback function that is executed in an Component to pass a msg (can be Information or just a string) to another Component.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msg</strong> (<em>Union</em><em>[</em><em>Information</em><em>, </em><em>str</em><em>]</em>) – message can be a Percept, Interpretation, Action or string.</p></li>
+<li><p><strong>rcv</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="#lib.types.Component" title="lib.types.Component"><em>Component</em></a><em>]</em>) – receiver might be optional, since Information already contains such data.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lib.ai.Agent.shutdown">
+<code class="sig-name descname">shutdown</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/lib/ai.html#Agent.shutdown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.ai.Agent.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dumps history and shuts off every sensor.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-lib.types">
+<span id="types"></span><h1>Types<a class="headerlink" href="#module-lib.types" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="lib.types.Component">
+<em class="property">class </em><code class="sig-prename descclassname">lib.types.</code><code class="sig-name descname">Component</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/types.html#Component"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.types.Component" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines general behavior of Sensors, Interpreters, Models and Actuators.</p>
+<dl class="attribute">
+<dt id="lib.types.Component.name">
+<code class="sig-name descname">name</code><a class="headerlink" href="#lib.types.Component.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Self-descriptor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lib.types.Component.destinations_ID">
+<code class="sig-name descname">destinations_ID</code><a class="headerlink" href="#lib.types.Component.destinations_ID" title="Permalink to this definition">¶</a></dt>
+<dd><p>(List[Interpreter]): list of the IDs of possible destinations</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lib.types.Component.sendID">
+<code class="sig-name descname">sendID</code><a class="headerlink" href="#lib.types.Component.sendID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Agent’s function/callback to pass a message to another Component given its Identifier</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lib.types.Component.get_destinations_ID">
+<em class="property">abstract </em><code class="sig-name descname">get_destinations_ID</code><span class="sig-paren">(</span><em class="sig-param">raw_data</em><span class="sig-paren">)</span> &#x2192; List[lib.types.Identifier]<a class="reference internal" href="_modules/lib/types.html#Component.get_destinations_ID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.types.Component.get_destinations_ID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given some data, decide destination. Must handle None/empty data.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lib.types.NestedDefaultDict">
+<em class="property">class </em><code class="sig-prename descclassname">lib.types.</code><code class="sig-name descname">NestedDefaultDict</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/types.html#NestedDefaultDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.types.NestedDefaultDict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="lib.types.Status">
+<em class="property">class </em><code class="sig-prename descclassname">lib.types.</code><code class="sig-name descname">Status</code><a class="reference internal" href="_modules/lib/types.html#Status"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.types.Status" title="Permalink to this definition">¶</a></dt>
+<dd><p>An enumeration.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-lib.sensors.sensor_base">
+<span id="sensor"></span><h1>Sensor<a class="headerlink" href="#module-lib.sensors.sensor_base" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="lib.sensors.sensor_base.Sensor">
+<em class="property">class </em><code class="sig-prename descclassname">lib.sensors.sensor_base.</code><code class="sig-name descname">Sensor</code><span class="sig-paren">(</span><em class="sig-param">name: str</em>, <em class="sig-param">waitable: bool</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/sensors/sensor_base.html#Sensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.sensors.sensor_base.Sensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to generalize Sensors.</p>
+<dl class="attribute">
+<dt id="lib.sensors.sensor_base.Sensor.__perceiver">
+<code class="sig-name descname">__perceiver</code><a class="headerlink" href="#lib.sensors.sensor_base.Sensor.__perceiver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Thread that runs self.perceiver()</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Thread</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lib.sensors.sensor_base.Sensor.waitable">
+<code class="sig-name descname">waitable</code><a class="headerlink" href="#lib.sensors.sensor_base.Sensor.waitable" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if Sensor will wait for destination to signal to pause or continue</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lib.sensors.sensor_base.Sensor.wait_event">
+<code class="sig-name descname">wait_event</code><a class="headerlink" href="#lib.sensors.sensor_base.Sensor.wait_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Event that will be evaluated in self.perceiver if waitable is true. Given that case, it will be set on or off if <cite>resume()</cite> or <cite>pause()</cite> functions are called.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lib.sensors.sensor_base.Sensor.off">
+<code class="sig-name descname">off</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/lib/sensors/sensor_base.html#Sensor.off"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.sensors.sensor_base.Sensor.off" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets status to STOPPED and waits for the __perceiver Thread to join.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lib.sensors.sensor_base.Sensor.on">
+<code class="sig-name descname">on</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/lib/sensors/sensor_base.html#Sensor.on"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.sensors.sensor_base.Sensor.on" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets wait_event to allow processing and starts sense function in another thread.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lib.sensors.sensor_base.Sensor.perceiver">
+<code class="sig-name descname">perceiver</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/sensors/sensor_base.html#Sensor.perceiver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.sensors.sensor_base.Sensor.perceiver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads and sends input. Waits if wait() method was called.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-lib.interpreters.interpreter_base">
+<span id="interpreter"></span><h1>Interpreter<a class="headerlink" href="#module-lib.interpreters.interpreter_base" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="lib.interpreters.interpreter_base.Interpreter">
+<em class="property">class </em><code class="sig-prename descclassname">lib.interpreters.interpreter_base.</code><code class="sig-name descname">Interpreter</code><span class="sig-paren">(</span><em class="sig-param">name: str</em>, <em class="sig-param">waitable: bool</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/interpreters/interpreter_base.html#Interpreter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.interpreters.interpreter_base.Interpreter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interpreter parent class.</p>
+<dl class="attribute">
+<dt id="lib.interpreters.interpreter_base.Interpreter.name">
+<code class="sig-name descname">name</code><a class="headerlink" href="#lib.interpreters.interpreter_base.Interpreter.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>A string that serves as an identifier for the Component.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lib.interpreters.interpreter_base.Interpreter.waitable">
+<code class="sig-name descname">waitable</code><a class="headerlink" href="#lib.interpreters.interpreter_base.Interpreter.waitable" title="Permalink to this definition">¶</a></dt>
+<dd><p>A boolean that indicates if the instance will have to wait
+for the answer of the forward connection.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lib.interpreters.interpreter_base.Interpreter.preprocess">
+<em class="property">abstract </em><code class="sig-name descname">preprocess</code><span class="sig-paren">(</span><em class="sig-param">raw_data: Any</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="_modules/lib/interpreters/interpreter_base.html#Interpreter.preprocess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.interpreters.interpreter_base.Interpreter.preprocess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given some raw_data, remove noise or add some useful metadata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The preprocessed raw data.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lib.interpreters.interpreter_base.Interpreter.process">
+<em class="property">abstract </em><code class="sig-name descname">process</code><span class="sig-paren">(</span><em class="sig-param">raw_data</em><span class="sig-paren">)</span> &#x2192; Generator<a class="reference internal" href="_modules/lib/interpreters/interpreter_base.html#Interpreter.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.interpreters.interpreter_base.Interpreter.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates (as soon as possible) if raw_data forms a significant
+composition or unit of perception and then returns the interpretation
+of such significant perception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Yields</dt>
+<dd class="field-odd"><p><em>bool</em> – Indicates the sensor if it should stop (True) or continue listening (False).
+Any: Preprocessed data (if bool was True)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lib.interpreters.interpreter_base.Interpreter.put">
+<code class="sig-name descname">put</code><span class="sig-paren">(</span><em class="sig-param">data: lib.types.Information</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/lib/interpreters/interpreter_base.html#Interpreter.put"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.interpreters.interpreter_base.Interpreter.put" title="Permalink to this definition">¶</a></dt>
+<dd><p>External method that serves to put data to the percept queue.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lib.interpreters.interpreter_base.Interpreter.send">
+<code class="sig-name descname">send</code><span class="sig-paren">(</span><em class="sig-param">raw_data: Any</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/interpreters/interpreter_base.html#Interpreter.send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.interpreters.interpreter_base.Interpreter.send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decides destination given raw_data and calls Agent’s sendID() to send
+such information to such destination.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>raw_data</strong> – data to be sent.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-lib.models.model_base">
+<span id="model"></span><h1>Model<a class="headerlink" href="#module-lib.models.model_base" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="lib.models.model_base.Model">
+<em class="property">class </em><code class="sig-prename descclassname">lib.models.model_base.</code><code class="sig-name descname">Model</code><span class="sig-paren">(</span><em class="sig-param">name: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/models/model_base.html#Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.models.model_base.Model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-lib.actuators.actuator_base">
+<span id="actuator"></span><h1>Actuator<a class="headerlink" href="#module-lib.actuators.actuator_base" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="lib.actuators.actuator_base.Actuator">
+<em class="property">class </em><code class="sig-prename descclassname">lib.actuators.actuator_base.</code><code class="sig-name descname">Actuator</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/actuators/actuator_base.html#Actuator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.actuators.actuator_base.Actuator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-lib.sensors.audition">
+<span id="audition-sensor"></span><h1>Audition Sensor<a class="headerlink" href="#module-lib.sensors.audition" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="lib.sensors.audition.Audition">
+<em class="property">class </em><code class="sig-prename descclassname">lib.sensors.audition.</code><code class="sig-name descname">Audition</code><span class="sig-paren">(</span><em class="sig-param">name: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/sensors/audition.html#Audition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.sensors.audition.Audition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstracts microphone.</p>
+<dl class="attribute">
+<dt id="lib.sensors.audition.Audition.CHUNK">
+<code class="sig-name descname">CHUNK</code><a class="headerlink" href="#lib.sensors.audition.Audition.CHUNK" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of samples.  Set to 4096.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lib.sensors.audition.Audition.RATE">
+<code class="sig-name descname">RATE</code><a class="headerlink" href="#lib.sensors.audition.Audition.RATE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The sampling rate. Set to 4800 (Hz).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lib.sensors.audition.Audition.WIDTH">
+<code class="sig-name descname">WIDTH</code><a class="headerlink" href="#lib.sensors.audition.Audition.WIDTH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Size of the format. Set to 2.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lib.sensors.audition.Audition.FORMAT">
+<code class="sig-name descname">FORMAT</code><a class="headerlink" href="#lib.sensors.audition.Audition.FORMAT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set to pyaudio.paInt16.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>type</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lib.sensors.audition.Audition.CHANNELS">
+<code class="sig-name descname">CHANNELS</code><a class="headerlink" href="#lib.sensors.audition.Audition.CHANNELS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of channels the stream read from. Set to 1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lib.sensors.audition.Audition.SILENCE_SEC">
+<code class="sig-name descname">SILENCE_SEC</code><a class="headerlink" href="#lib.sensors.audition.Audition.SILENCE_SEC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number seconds of silence/noise that will consider before and after not-noise signal. Set to 1.5.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lib.sensors.audition.Audition.SILENCE_FRAMES">
+<code class="sig-name descname">SILENCE_FRAMES</code><a class="headerlink" href="#lib.sensors.audition.Audition.SILENCE_FRAMES" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper variable to count number of seconds passed. Defaults to 0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lib.sensors.audition.Audition.IS_NOISE">
+<code class="sig-name descname">IS_NOISE</code><a class="headerlink" href="#lib.sensors.audition.Audition.IS_NOISE" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if last read buffer was noise, false otherwise. Defaults to True.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lib.sensors.audition.Audition.BIAS">
+<code class="sig-name descname">BIAS</code><a class="headerlink" href="#lib.sensors.audition.Audition.BIAS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number that will be subtracted to the calculated threshold in setup_mic(). Set to 300.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lib.sensors.audition.Audition.past_window">
+<code class="sig-name descname">past_window</code><a class="headerlink" href="#lib.sensors.audition.Audition.past_window" title="Permalink to this definition">¶</a></dt>
+<dd><p>container of the past SILENCE_SEC seconds of data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>deque</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lib.sensors.audition.Audition.get_destinations_ID">
+<code class="sig-name descname">get_destinations_ID</code><span class="sig-paren">(</span><em class="sig-param">raw_data: Any</em><span class="sig-paren">)</span> &#x2192; List[lib.types.Identifier]<a class="reference internal" href="_modules/lib/sensors/audition.html#Audition.get_destinations_ID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.sensors.audition.Audition.get_destinations_ID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decides which destinations to send raw_data.
+.. note:: At the moment, it picks the first destination, since there is only one compatible anyway.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>raw_data</strong> (<em>Any</em>) – data that will determine the relevant destination.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of Identifiers of the destinations.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List[Identifier]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lib.sensors.audition.Audition.get_stream">
+<code class="sig-name descname">get_stream</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/sensors/audition.html#Audition.get_stream"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.sensors.audition.Audition.get_stream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to open a pyaudio stream.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>None</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>instance of pyaudio.Pyaudio.open()
+p: instance of pyaudio.Pyaudio</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>stream</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lib.sensors.audition.Audition.pass_msg">
+<code class="sig-name descname">pass_msg</code><span class="sig-paren">(</span><em class="sig-param">msg: str</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/lib/sensors/audition.html#Audition.pass_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.sensors.audition.Audition.pass_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receives a message.</p>
+<dl class="simple">
+<dt>Can be of two types:</dt><dd><ul class="simple">
+<li><p>PAUSE: to call pause()</p></li>
+<li><p>RESUME: to call resume()</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>msg</strong> (<em>str</em>) – string sent from another Component through the Agent.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lib.sensors.audition.Audition.read_input">
+<code class="sig-name descname">read_input</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="_modules/lib/sensors/audition.html#Audition.read_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.sensors.audition.Audition.read_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a self.CHUNK from self.stream and returns it if its rms
+is over self.THRESHOLD. It will maintain self.past_window, a collection
+of the past chunks, and it will append it to the start of the first
+relevant data it encounters.</p>
+<p>After relevant data, self.IS_NOISE will still be True and data will be
+sent normally, but after self.SILENCE_SEC seconds it will send a chunk
+of empty data and set self.IS_NOISE to True.</p>
+<p>A chunk of audio is relevant if its rms exceeds the self.THRESHOLD.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>None</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>data or None</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lib.sensors.audition.Audition.setup_mic">
+<code class="sig-name descname">setup_mic</code><span class="sig-paren">(</span><em class="sig-param">seconds: str = 2</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/lib/sensors/audition.html#Audition.setup_mic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.sensors.audition.Audition.setup_mic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets up a THRESHOLD recording equal to the rms of the 20% largest bytes of a 2-second (default) signal recorded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>seconds</strong> – number of seconds to run the mic setup. Defaults to 2.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="speech-recognizer-interpreter">
+<h1>Speech Recognizer Interpreter<a class="headerlink" href="#speech-recognizer-interpreter" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-lib.interpreters.speech_recognizer"></span><dl class="class">
+<dt id="lib.interpreters.speech_recognizer.SpeechRecognizer">
+<em class="property">class </em><code class="sig-prename descclassname">lib.interpreters.speech_recognizer.</code><code class="sig-name descname">SpeechRecognizer</code><span class="sig-paren">(</span><em class="sig-param">name: str</em>, <em class="sig-param">sr: str = 'pocketsphinx'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/interpreters/speech_recognizer.html#SpeechRecognizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.interpreters.speech_recognizer.SpeechRecognizer" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="lib.interpreters.speech_recognizer.SpeechRecognizer.get_destinations_ID">
+<code class="sig-name descname">get_destinations_ID</code><span class="sig-paren">(</span><em class="sig-param">raw_data</em><span class="sig-paren">)</span> &#x2192; List[lib.types.Identifier]<a class="reference internal" href="_modules/lib/interpreters/speech_recognizer.html#SpeechRecognizer.get_destinations_ID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.interpreters.speech_recognizer.SpeechRecognizer.get_destinations_ID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given some data, decide destination. Must handle None/empty data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lib.interpreters.speech_recognizer.SpeechRecognizer.preprocess">
+<code class="sig-name descname">preprocess</code><span class="sig-paren">(</span><em class="sig-param">raw_data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/interpreters/speech_recognizer.html#SpeechRecognizer.preprocess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.interpreters.speech_recognizer.SpeechRecognizer.preprocess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filtering</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lib.interpreters.speech_recognizer.SpeechRecognizer.process">
+<code class="sig-name descname">process</code><span class="sig-paren">(</span><em class="sig-param">raw_data</em><span class="sig-paren">)</span> &#x2192; Generator<a class="reference internal" href="_modules/lib/interpreters/speech_recognizer.html#SpeechRecognizer.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.interpreters.speech_recognizer.SpeechRecognizer.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates (as soon as possible) if raw_data forms a significant
+composition or unit of perception and then returns the interpretation
+of such significant perception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Yields</dt>
+<dd class="field-odd"><p><em>bool</em> – Indicates the sensor if it should stop (True) or continue listening (False).
+Any: Preprocessed data (if bool was True)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, dgcnz.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> and ❤️  using a custom <a href="https://github.com/LinxiFan/Sphinx-theme">theme</a> based on <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/language_data.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
