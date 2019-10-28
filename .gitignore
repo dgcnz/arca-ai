@@ -24,3 +24,4 @@ code/resources/keys
 code/__pycache__
 code/lib/utilities/__pycache__
 docs/build/
+code/logs
