@@ -14,7 +14,8 @@ class Model(Component, ABC):
     def put(self, data: Information) -> None:
         raw_actions = self.decide(data)
         for raw_action in raw_actions:
-            self.send(raw_action)
+            if raw_action["data"] is not None:
+                self.send(raw_action)
 
     @abstractmethod
     def decide(self, data: Interpretation) -> List[Any]:
