@@ -34,7 +34,7 @@ class Agent(Subject):
     def __init__(self, name: str):
         self.name = name
         self.logger = setup_logger(f"{name}",
-                                   f"logs/Agent/{name}/{get_date()}")
+                                   f"logs/Agent/{name}/{get_date()}.txt")
 
     def shutdown(self) -> None:
         """

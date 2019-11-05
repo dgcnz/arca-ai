@@ -91,7 +91,7 @@ def get_type_sentence(sent: str) -> str:
     pass
 
 
-class NLU(Interpreter):
+class NLP(Interpreter):
     def __init__(self, name: str):
         super().__init__(name, False)
         name, cat = self.dumpID().to_tuple()

@@ -30,6 +30,7 @@ class SpeechRecognizer(Interpreter):
         config.set_string('-hmm', path.join(self.MODELDIR, 'es-es'))
         config.set_string('-lm', path.join(self.MODELDIR, 'es-es.lm'))
         config.set_string('-dict', path.join(self.MODELDIR, 'es.dict'))
+        config.set_string('-logfn', '/dev/null')
 
         self.decoder = Decoder(config)
 
