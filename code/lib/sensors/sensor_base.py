@@ -28,7 +28,7 @@ class Sensor(Component, ABC):
         """
         self.status = Status.RUNNING
         self.wait_event.set()
-        print(f"{self.name} sensor is on.")
+        self.logger.info(f"{self.name} sensor is on.")
         self.__perceiver.start()
 
     def off(self) -> None:
@@ -39,7 +39,7 @@ class Sensor(Component, ABC):
         self.__perceiver.join(timeout=TIMEOUT)
         if self.__perceiver.is_alive():
             raise Exception(f"Sensor {self.name} wasn't shut down correctly.")
-        print(f"{self.name} sensor is off.")
+        self.logger.info(f"{self.name} sensor is off.")
 
     def send(self, raw_data):
         for dest_ID in self.get_destinations_ID(raw_data):
@@ -54,7 +54,7 @@ class Sensor(Component, ABC):
         self.status = Status.PAUSED
 
     def check_status(self):
-        print(f"SENSOR.IS_ALIVE(): {self.__perceiver.is_alive()}")
+        self.logger.info(f"SENSOR.IS_ALIVE(): {self.__perceiver.is_alive()}")
 
     def perceiver(self):
         """

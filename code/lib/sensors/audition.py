@@ -1,6 +1,6 @@
 from lib.sensors.sensor_base import Sensor
 from lib.types import Identifier
-from lib.utilities.helpers import bytes_to_np, np_to_bytes, get_logger, get_date
+from lib.utilities.helpers import bytes_to_np, np_to_bytes
 from typing import List, Any
 from collections import deque
 import numpy as np
@@ -38,9 +38,7 @@ class Audition(Sensor):
         self.BIAS = 300
         self.past_window = deque(maxlen=int(self.SILENCE_SEC * self.RATE /
                                             self.CHUNK))
-        name, cat = self.dumpID().to_tuple()
-        self.logger = get_logger(f"{cat}.{name}",
-                                 f"logs/{cat}/{name}/{get_date()}")
+        self.logger = self.get_logger()
 
     def get_destinations_ID(self, raw_data: Any) -> List[Identifier]:
         """Decides which destinations to send raw_data.

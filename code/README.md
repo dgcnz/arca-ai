@@ -1,7 +1,7 @@
 
 ## Troubleshooting 
 
-### OSX (MAC)
+### MAC OSX
 
 #### PyAudio
 
@@ -44,4 +44,25 @@ to
 
 Ultimately, run `python setup.py install`.
 
+#### Pattern
+
+Pattern has some issues when run in Python 3.7+. These are mainly due to changes made in generator behavior. From the [Python Docs](https://docs.python.org/3/whatsnew/3.7.html):
+> PEP 479 is enabled for all code in Python 3.7, meaning that StopIteration exceptions raised directly or indirectly in coroutines and generators are transformed into RuntimeError exceptions. (Contributed by Yury Selivanov in bpo-32670.)
+
+To fix this, we simply have to change all the `raise StopIteration` expressions to `return`.
+
+Having started the virtual environment, go to the `build/` folder or any of your choice and follow these steps.
+
+```sh
+
+git clone https://github.com/clips/pattern.git
+cd pattern
+
+# To see files to change
+grep -rnw '.' -e 'raise StopIteration'
+
+# You can open all relevant files shown in previous step and change them manually or
+# execute this script (only tested on MAC OS)
+find . -type f -name '*.py' -exec sed -i '' -e 's/raise StopIteration/return/g' {} +
+```
 

@@ -7,9 +7,10 @@ from typing import List, Any
 class Speech(Actuator):
     def __init__(self, name: str):
         super().__init__(name)
+        self.logger = self.get_logger()
 
     def do(self, action: Action) -> None:
-        print(f"Saying: {action.data}")
+        self.logger.info(f"Saying: {action.data}")
         call(["python", "lib/utilities/speak.py", action.data["data"]])
 
     def pass_msg(self, msg: str) -> None:

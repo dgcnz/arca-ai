@@ -1,5 +1,6 @@
 from typing import List, Any, Tuple, Callable
 from lib.types import Interpretation, Identifier, NestedDefaultDict
+from lib.utilities.helpers import rec_dict_access
 from lib.models.model_base import Model
 from chatterbot.trainers import ChatterBotCorpusTrainer
 from chatterbot import ChatBot
@@ -35,6 +36,7 @@ class Chatterbot(Model):
             database_uri='sqlite:///database.db')
         self.trainer = ChatterBotCorpusTrainer(self.chatbot)
         self.memory = NestedDefaultDict()
+        self.logger = self.get_logger()
 
     def train(self, model_corpuses: Any) -> None:
         for corpus in model_corpuses:
@@ -60,13 +62,29 @@ class Chatterbot(Model):
 
     def say(self, data: Any) -> str:
         # get from memory or answer
-        ans = []
 
-        for k, v in self.memory.items():
-            msg = f"{arrow.get(k).humanize(locale='es')}: {v}"
-            ans.append(msg)
+        date = data["attr"]["datetime"]
+        if date is not None and date["precision"] is not None:
+            ans = []
+            precision = date["precision"]
+            self.logger.info("DATE: ", date)
 
-        return ans[0]
+            date_task = self.get_tasks_from_precision(date, precision)
+            for (date_str, task) in date_task:
+                a = arrow.get(
+                    date_str,
+                    "YYYY MM DD HH mm").replace(tzinfo="America/Lima")
+                self.logger.info(f"DATE FROM MEMORY: {date_str}")
+                print(a.humanize(locale="es"))
+                print(a)
+                msg = f"{a.humanize(locale='es')}: {task}"
+                ans.append(msg)
+            if len(ans) == 0:
+                return f"No hay nada pendiente {date['text']}"
+            return ", ".join(ans)
+
+        self.logger.info("NO USEFUL DATE WAS PROVIDED.")
+        return self.chat(data)
 
     def answer(self, data: Any) -> str:
         pass
@@ -75,31 +93,53 @@ class Chatterbot(Model):
         return str(data["text"])
 
     def remind(self, data: Any) -> None:
-        try:
-            date = data["attr"]["datetime"]["value"]
-        except:
-            print("NO DATE WAS PROVIDED.")
+        if data["attr"]["datetime"] is not None:
+            date = data["attr"]["datetime"]
+            self.logger.info("DATE: ", date)
+            print(date)
+            self.remember(date["value"], data["attr"]["task"])
+        else:
+            self.logger.info("NO DATE WAS PROVIDED.")
         # put value into memory at date
 
-        self.memory[date] = data["text"]
         return None
+
+    def remember(self, date: str, subj: str):
+        # 2019-11-04T16:41:00.000-05:00
+        d = arrow.get(date)
+        year, month, day, hour, minute = d.format("YYYY MM DD HH mm").split(
+            " ")
+
+        try:
+            self.memory[year][month][day][hour][minute].append(subj)
+        except Exception:
+            self.memory[year][month][day][hour][minute] = [subj]
+
+    def get_tasks_from_precision(self, date, precision):
+        precedence = ["year", "month", "day", "hour", "minute", "second"]
+        index = precedence.index(precision)
+        date = arrow.get(date["value"])
+        ymdhm = date.format("YYYY MM DD HH mm").split(" ")
+
+        base = ymdhm[:index + 1]
+        temp = self.memory
+        for i in range(index + 1):
+            temp = temp[ymdhm[i]]
+
+        return rec_dict_access(temp, " ".join(base))
 
     def decide(self, ir: Interpretation) -> List[Any]:
         """
         Return a list of raw actions given an Interpretation.
         """
-        cmds_fx: List[Command] = []
         raw_actions: List[Any] = []
 
-        if ir.data["text"] is None or len(ir.data["attr"]["commands"]) == 0:
+        if ir.data["text"] is None:
             return []
 
-        cmds_fx = [self.parse_command(x) for x in ir.data["attr"]["commands"]]
+        cmd, fx = self.parse_command(ir.data["attr"]["command"])
 
-        raw_actions = [{
-            "data": fx(ir.data),
-            "command": cmd
-        } for cmd, fx in cmds_fx]
+        raw_actions = [{"data": fx(ir.data), "command": cmd}]
 
         return raw_actions
 

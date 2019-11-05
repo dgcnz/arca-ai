@@ -53,7 +53,7 @@ class Interpreter(Component, ABC):
             data = self.preprocess(raw_data.data)
             gen = self.process(data)
             stop = next(gen)
-            print(f"STOP: {stop}")
+            self.logger.info(f"STOP: {stop}")
             if stop:
                 self.sendID("PAUSE", raw_data.src)
                 processed_data = next(gen)
@@ -61,7 +61,7 @@ class Interpreter(Component, ABC):
                 if self.waitable:
                     self.e.wait()
                 self.e.clear()
-                print("FINISHED WAITING, RESUMING SENSOR")
+                self.logger.info("FINISHED WAITING, RESUMING SENSOR")
                 self.sendID("RESUME", raw_data.src)
                 with self.queue.mutex:
                     self.queue.queue.clear()

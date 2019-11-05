@@ -5,7 +5,7 @@ from lib.models.model_base import Model
 from lib.actuators.actuator_base import Actuator
 from lib.observers.observer_base import Subject, Observer
 from typing import Dict, List, Union, Optional
-from lib.utilities.helpers import create_path, get_date, get_logger
+from lib.utilities.helpers import create_path, get_date, setup_logger
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -33,7 +33,8 @@ class Agent(Subject):
 
     def __init__(self, name: str):
         self.name = name
-        self.logger = get_logger(f"{name}", f"logs/Agent/{name}/{get_date()}")
+        self.logger = setup_logger(f"{name}",
+                                   f"logs/Agent/{name}/{get_date()}")
 
     def shutdown(self) -> None:
         """

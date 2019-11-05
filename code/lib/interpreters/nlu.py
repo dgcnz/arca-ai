@@ -1,7 +1,6 @@
 from lib.interpreters.interpreter_base import Interpreter
 from lib.types import Identifier
-from lib.utilities.helpers import get_logger, get_date
-from typing import List, Generator, Any
+from typing import List, Generator, Any, Tuple
 from nltk.tokenize.toktok import ToktokTokenizer
 from duckling import DucklingWrapper, Language
 from pattern.es import parse, split, conjugate, PRESENT, IMPERATIVE, SG
@@ -10,7 +9,7 @@ import string
 import unicodedata
 
 tokenize = ToktokTokenizer().tokenize
-d = DucklingWrapper(language=Language.SPANISH)
+duck = DucklingWrapper(language=Language.SPANISH)
 pron_refl = ["me", "te", "se", "nos", "os"]
 pron_dobj = ["lo", "los", "la", "las"]
 enclitic_pat = re.compile(
@@ -40,50 +39,63 @@ def is_imperative(word: str):
         txt = normalize(txt)
         ans = parse(txt, lemmata=True).split('/')
         return True, '/'.join([word] + ans[1:])
-
     return False, None
 
 
 def parse_date(sent: str):
     if sent is None:
         return None
+    ans = duck.parse_time(sent)
+    precedence = ["year", "month", "day", "hour", "minute", "second"]
 
-    ans = d.parse_time(sent)
     if len(ans) > 0:
-        return {"text": ans[0]["text"], "value": ans[0]["value"]["value"]}
+        text = ans[0]["text"]
+        val = ans[0]["value"]["value"]
+        if "grain" in ans[0]["value"]:
+            precision = precedence[precedence.index(ans[0]["value"]["grain"]) -
+                                   1]
+        else:
+            precision = None
+
+        if "to" in val:
+            return {"text": text, "value": val["to"], "precision": precision}
+        else:
+            return {"text": text, "value": val, "precision": precision}
     else:
         return None
 
 
-def syntax_analyze(sent: str):
+def syntax_analyze(sent: str) -> Tuple[List, str]:
     parsed_list = []
-    commands = []
+    command = None
     if sent is not None:
         parsed = parse(sent, lemmata=True)
         parsed_list = parsed.split(" ")
-
         for s in split(parsed)[0]:
             if s.index == 0 and s.type != "VB":
                 flag, fixed = is_imperative(str(s))
                 if flag:
                     parsed_list[s.index] = fixed
-                    commands.append(fixed.split("/")[-1])
+                    command = fixed.split("/")[-1]
             if s.index == 0 and s.type == "VB":
                 if conjugate(str(s), PRESENT, 2, SG,
                              mood=IMPERATIVE) == str(s).lower():
-                    commands.append(str(s).lower())
-    if len(commands) == 0:
-        commands.append("responder")
+                    command = str(s).lower()
+    if command is None:
+        command = "conversar"
+    return parsed_list, command
 
-    return parsed_list, commands
+
+def get_type_sentence(sent: str) -> str:
+    tokens = tokenize(sent)
+    pass
 
 
 class NLU(Interpreter):
     def __init__(self, name: str):
         super().__init__(name, False)
         name, cat = self.dumpID().to_tuple()
-        self.logger = get_logger(f"{cat}.{name}",
-                                 f"logs/{cat}/{name}/{get_date()}")
+        self.logger = self.get_logger()
 
     def get_destinations_ID(self, raw_data) -> List[Identifier]:
         return [self.destinations_ID[0]]
@@ -106,16 +118,29 @@ class NLU(Interpreter):
 
     def process(self, raw_data) -> Generator:
         yield True
-        syntax, commands = syntax_analyze(raw_data)
+        syntax, command, date, task = [None, None, None, None]
+
+        if raw_data is not None:
+            syntax, command = syntax_analyze(raw_data)
+            date = parse_date(raw_data)
+            try:
+                task = raw_data.replace("" if date is None else date["text"],
+                                        "")
+                task = task.split(" ",
+                                  1)[1] if command != "conversar" else task
+            except Exception:
+                pass
+
         res = {
             "text": raw_data,
             "attr": {
-                "datetime": parse_date(raw_data),
-                "commands": commands,
-                "syntax": syntax
+                "datetime": date,
+                "command": command,
+                "syntax": syntax,
+                "task": task
             }
         }
-        print(res)
+        self.logger.info(res)
         yield res
         return
 

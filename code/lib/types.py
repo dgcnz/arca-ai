@@ -2,6 +2,7 @@ from enum import Enum, auto
 from typing import Callable, List, Any
 from abc import ABC, abstractmethod
 from collections import defaultdict
+from lib.utilities.helpers import setup_logger, get_date
 
 
 class Status(Enum):
@@ -35,7 +36,7 @@ class Component(ABC):
     def __init__(self, name):
         self.name: str = name
         self.destinations_ID: List[Identifier] = []
-        self.sendID: Callable
+        self.sendID: Callable = None
 
     def add_destination_ID(self, dest_ID: Identifier):
         self.destinations_ID.append(dest_ID)
@@ -43,6 +44,11 @@ class Component(ABC):
     def dumpID(self) -> Identifier:
         base_class = self.__class__.__bases__[0].__name__
         return Identifier(self.name, base_class)
+
+    def get_logger(self):
+        name, cat = self.dumpID().to_tuple()
+        return setup_logger(f"{cat}.{name}",
+                            f"logs/{cat}/{name}/{get_date()}.txt")
 
     @abstractmethod
     def get_destinations_ID(self, raw_data) -> List[Identifier]:

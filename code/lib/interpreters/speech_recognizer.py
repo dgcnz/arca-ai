@@ -10,6 +10,7 @@ from google.oauth2 import service_account
 class SpeechRecognizer(Interpreter):
     def __init__(self, name: str, sr: str = "pocketsphinx"):
         super().__init__(name, True)
+        self.logger = self.get_logger()
         self.sr = sr
         self.current_data = []
         self.setup()
@@ -22,7 +23,7 @@ class SpeechRecognizer(Interpreter):
             self.setup_googlespeech()
 
     def setup_pocketsphinx(self) -> None:
-        print("Setting up PocketSphinx.")
+        self.logger.info("Setting up PocketSphinx.")
         self.MODELDIR = "resources/model"
 
         config = Decoder.default_config()
@@ -34,10 +35,10 @@ class SpeechRecognizer(Interpreter):
 
         self.prev_buf_is_speech = False
         self.decoder.start_utt()
-        print("Done setting up PocketSphinx.")
+        self.logger.info("Done setting up PocketSphinx.")
 
     def setup_googlespeech(self) -> None:
-        print("Setting up Google Speech.")
+        self.logger.info("Setting up Google Speech.")
         credentials = service_account.Credentials.from_service_account_file(
             'resources/keys/credentials.json')
         config = speech.types.RecognitionConfig(
@@ -48,7 +49,7 @@ class SpeechRecognizer(Interpreter):
         self.client = speech.SpeechClient(credentials=credentials)
         self.streaming_config = speech.types.StreamingRecognitionConfig(
             config=config)
-        print("Done setting up Google Speech.")
+        self.logger.info("Done setting up Google Speech.")
 
     def get_destinations_ID(self, raw_data) -> List[Identifier]:
         return [self.destinations_ID[0]]
@@ -61,7 +62,8 @@ class SpeechRecognizer(Interpreter):
         self.decoder.process_raw(raw_data, False, False)
         cur_buf_is_speech = self.decoder.get_in_speech()
         data = None
-        print(f"prev: {self.prev_buf_is_speech}, current: {cur_buf_is_speech}")
+        self.logger.info(
+            f"prev: {self.prev_buf_is_speech}, current: {cur_buf_is_speech}")
 
         if not self.prev_buf_is_speech and cur_buf_is_speech:
             # Now in speech -> Start listening
@@ -77,7 +79,7 @@ class SpeechRecognizer(Interpreter):
 
         elif self.prev_buf_is_speech and not cur_buf_is_speech:
             # No longer in speech -> stop listening and process
-            print("No longer in speech, yielding True.")
+            self.logger.info("No longer in speech, yielding True.")
             yield True
             self.decoder.end_utt()
             if (self.sr == "googlespeech"):
@@ -90,7 +92,7 @@ class SpeechRecognizer(Interpreter):
                     data = response.results[0].alternatives[0].transcript
                     conf = response.results[0].alternatives[0].confidence
                 except Exception as e:
-                    print(f"{self.name}>> {e}")
+                    self.logger.info(f"{self.name}>> {e}")
                     conf = None
                     data = None
                 self.current_data.clear()
@@ -101,10 +103,10 @@ class SpeechRecognizer(Interpreter):
                     if data == "":
                         data = None
                 except Exception as e:
-                    print(f"{self.name}>> {e}")
+                    self.logger.info(f"{self.name}>> {e}")
                     conf = None
                     data = None
-            print(
+            self.logger.info(
                 f"{self.name}>> Heard DATA: '{data}' with confidence: {conf}.")
             self.decoder.start_utt()
             self.prev_buf_is_speech = cur_buf_is_speech
