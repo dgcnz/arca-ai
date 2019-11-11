@@ -4,6 +4,7 @@ from lib.utilities.helpers import rec_dict_access
 from lib.models.model_base import Model
 from chatterbot.trainers import ChatterBotCorpusTrainer
 from chatterbot import ChatBot
+from chatterbot.comparisons import levenshtein_distance
 from chatterbot.logic import LogicAdapter
 from enum import Enum, auto
 import arrow
@@ -26,8 +27,10 @@ class Language(Model):
         self.logger = self.get_logger()
         self.chatbot = ChatBot(
             agent_name,
+            statement_comparison_function=levenshtein_distance,
             storage_adapter="chatterbot.storage.MongoDatabaseAdapter",
-            database_uri='mongodb://127.0.0.1:27017/arca',
+            database_uri=
+            'mongodb+srv://arca:arca@arca-vfwrf.gcp.mongodb.net/test?retryWrites=true&w=majority',
             logic_adapters=logic_adapters,
             logger=self.logger)
         self.trainer = ChatterBotCorpusTrainer(self.chatbot)
