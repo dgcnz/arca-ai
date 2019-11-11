@@ -9,3 +9,4 @@ flask
 numpy
 nltk
 scipy
+arrow

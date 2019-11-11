@@ -26,3 +26,5 @@ code/lib/utilities/__pycache__
 docs/build/
 code/logs
 code/data
+code/database.sqlite3
+code/hs_err_pid7611.lo

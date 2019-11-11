@@ -26,9 +26,9 @@ class Language(Model):
         self.logger = self.get_logger()
         self.chatbot = ChatBot(
             agent_name,
-            storage_adapter="chatterbot.storage.MongoDatabaseAdapter",
+            storage_adapter='chatterbot.storage.SQLStorageAdapter',
+            database_uri='sqlite:///database.sqlite3',
             logic_adapters=logic_adapters,
-            database_uri='mongodb://127.0.0.1:27017/arca',
             logger=self.logger)
         self.trainer = ChatterBotCorpusTrainer(self.chatbot)
         self.memory = NestedDefaultDict()

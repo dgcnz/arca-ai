@@ -12,7 +12,8 @@ from lib.actuators.speech import Speech
 la = [{
     'import_path': 'chatterbot.logic.BestMatch',
     'default_response': 'Lo siento, no entendí.',
-    'maximum_similarity_threshold': 0.70
+    'maximum_similarity_threshold': 0.70,
+    "statement_comparison_function": "chatterbot.comparisons.levenshtein_distance"
 }]
 
 corpuses = [
