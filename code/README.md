@@ -64,5 +64,9 @@ grep -rnw '.' -e 'raise StopIteration'
 # You can open all relevant files shown in previous step and change them manually or
 # execute this script (only tested on MAC OS)
 find . -type f -name '*.py' -exec sed -i '' -e 's/raise StopIteration/return/g' {} +
+
+# for Linux
+find . -type f -name '*.py' -exec sed -i 's/raise StopIteration/return/g' {} \;
+
 ```
 

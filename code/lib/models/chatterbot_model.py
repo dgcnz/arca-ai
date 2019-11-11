@@ -4,6 +4,7 @@ from lib.utilities.helpers import rec_dict_access
 from lib.models.model_base import Model
 from chatterbot.trainers import ChatterBotCorpusTrainer
 from chatterbot import ChatBot
+from chatterbot.comparisons import levenshtein_distance
 from chatterbot.logic import LogicAdapter
 from enum import Enum, auto
 import arrow

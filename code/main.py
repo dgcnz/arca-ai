@@ -1,5 +1,4 @@
-from dotenv import load_dotenv
-load_dotenv()
+import settings
 import time
 import signal
 import sys
@@ -58,7 +57,7 @@ def main():
     sr = SpeechRecognizer("sr", "googlespeech")
     nlp = NLP("nlp")
     lang = Language("language", "ARCA", la)
-    lang.train(corpuses)
+    # lang.train(corpuses)
     voice = Speech("speech")
 
     ARCA.add_component(hearing)
