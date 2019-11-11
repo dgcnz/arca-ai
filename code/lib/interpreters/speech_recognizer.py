@@ -1,10 +1,10 @@
 from lib.interpreters.interpreter_base import Interpreter
 from lib.types import Identifier
 from typing import List, Generator, Any
-from os import path
 from pocketsphinx.pocketsphinx import Decoder
 from google.cloud import speech
 from google.oauth2 import service_account
+import os
 
 
 class SpeechRecognizer(Interpreter):
@@ -16,7 +16,7 @@ class SpeechRecognizer(Interpreter):
         self.setup()
 
     def setup(self) -> None:
-        self.RATE = 48000  # TODO: this is defined in Audition Sensor.
+        self.RATE = int(os.getenv("RATE"))
         self.setup_pocketsphinx()
 
         if (self.sr == "googlespeech"):
@@ -27,9 +27,9 @@ class SpeechRecognizer(Interpreter):
         self.MODELDIR = "resources/model"
 
         config = Decoder.default_config()
-        config.set_string('-hmm', path.join(self.MODELDIR, 'es-es'))
-        config.set_string('-lm', path.join(self.MODELDIR, 'es-es.lm'))
-        config.set_string('-dict', path.join(self.MODELDIR, 'es.dict'))
+        config.set_string('-hmm', os.path.join(self.MODELDIR, 'es-es'))
+        config.set_string('-lm', os.path.join(self.MODELDIR, 'es-es.lm'))
+        config.set_string('-dict', os.path.join(self.MODELDIR, 'es.dict'))
         config.set_string('-logfn', '/dev/null')
 
         self.decoder = Decoder(config)

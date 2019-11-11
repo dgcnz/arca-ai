@@ -1,19 +1,23 @@
-from lib.interpreters.interpreter_base import Interpreter
-from lib.types import Identifier
-from typing import List, Generator, Any, Tuple
-from nltk.tokenize.toktok import ToktokTokenizer
-from duckling import DucklingWrapper, Language
 from pattern.es import parse, split, conjugate, PRESENT, IMPERATIVE, SG
-import re
-import string
+from lib.interpreters.interpreter_base import Interpreter
+from nltk.tokenize.toktok import ToktokTokenizer
+from typing import List, Generator, Any, Tuple
+from lib.types import Identifier
 import unicodedata
+import requests
+import string
+import re
+import os
 
 tokenize = ToktokTokenizer().tokenize
-duck = DucklingWrapper(language=Language.SPANISH)
 pron_refl = ["me", "te", "se", "nos", "os"]
 pron_dobj = ["lo", "los", "la", "las"]
 enclitic_pat = re.compile(
     f".*(?={'|'.join(pron_refl)})(?={'|'.join(pron_dobj)})?")
+DUCKLING_HOST = os.getenv("DUCKLING_HOST")
+DUCKLING_PORT = os.getenv("DUCKLING_PORT")
+print(DUCKLING_HOST, DUCKLING_PORT)
+DUCKLING_URL = f"{DUCKLING_HOST}:{DUCKLING_PORT}"
 
 
 def untokenize(tokens):
@@ -32,6 +36,13 @@ def normalize(string: str):
     return res
 
 
+def parse_date(sent: str):
+    r = requests.get(DUCKLING_URL, params={'sent': sent})
+    if r.status_code == 200:
+        return r.json()
+    raise Exception(f"DUCKLING server is not responding. {DUCKLING_URL}")
+
+
 def is_imperative(word: str):
     base = enclitic_pat.match(word)
     if base:
@@ -40,29 +51,6 @@ def is_imperative(word: str):
         ans = parse(txt, lemmata=True).split('/')
         return True, '/'.join([word] + ans[1:])
     return False, None
-
-
-def parse_date(sent: str):
-    if sent is None:
-        return None
-    ans = duck.parse_time(sent)
-    precedence = ["year", "month", "day", "hour", "minute", "second"]
-
-    if len(ans) > 0:
-        text = ans[0]["text"]
-        val = ans[0]["value"]["value"]
-        if "grain" in ans[0]["value"]:
-            precision = precedence[precedence.index(ans[0]["value"]["grain"]) -
-                                   1]
-        else:
-            precision = None
-
-        if "to" in val:
-            return {"text": text, "value": val["to"], "precision": precision}
-        else:
-            return {"text": text, "value": val, "precision": precision}
-    else:
-        return None
 
 
 def syntax_analyze(sent: str) -> Tuple[List, str]:

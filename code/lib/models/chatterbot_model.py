@@ -27,8 +27,8 @@ class Language(Model):
         self.chatbot = ChatBot(
             agent_name,
             storage_adapter="chatterbot.storage.MongoDatabaseAdapter",
-            logic_adapters=logic_adapters,
             database_uri='mongodb://127.0.0.1:27017/arca',
+            logic_adapters=logic_adapters,
             logger=self.logger)
         self.trainer = ChatterBotCorpusTrainer(self.chatbot)
         self.memory = NestedDefaultDict()
@@ -146,28 +146,3 @@ class Language(Model):
 
     def dump_history(self, filename: str, data: List[Any]) -> None:
         pass
-
-
-def main():
-    la = [{
-        'import_path': 'chatterbot.logic.BestMatch',
-        'default_response': 'Lo siento, no entendí.',
-        'maximum_similarity_threshold': 0.60
-    }]
-
-    corpuses = [
-        './resources/corpuses/spanish/',
-    ]
-    lang = Language("language", "ARCA", la)
-    lang.train(corpuses)
-
-    while True:
-        x = input("> ")
-        if x == "stop":
-            break
-        data = {"text": x}
-        lang.chat(data)
-
-
-if __name__ == "__main__":
-    main()
