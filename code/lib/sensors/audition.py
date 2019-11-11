@@ -7,6 +7,7 @@ import numpy as np
 import pyaudio
 import audioop
 import wave
+import os
 
 
 class Audition(Sensor):
@@ -27,13 +28,20 @@ class Audition(Sensor):
     def __init__(self, name: str):
         super().__init__(name, True)
 
-        self.CHUNK = 1024 * 4
-        self.RATE = 48000
-        self.WIDTH = 2
-        self.FORMAT = pyaudio.paInt16
-        self.CHANNELS = 1
+        self.CHUNK = int(os.getenv("CHUNK"))
+        self.RATE = int(os.getenv("RATE"))
+        self.WIDTH = int(os.getenv("WIDTH"))
+        self.FORMAT = int(os.getenv("FORMAT"))
+        self.CHANNELS = int(os.getenv("CHANNELS"))
+        print(self.CHUNK, self.RATE, self.WIDTH, self.FORMAT, self.CHANNELS)
+
+        try:
+            self.DEVICE_INDEX = int(os.getenv("DEVICE_INDEX"))
+        except Exception:
+            self.DEVICE_INDEX = None
+
         self.SILENCE_FRAMES = 0
-        self.SILENCE_SEC = 1.5
+        self.SILENCE_SEC = 2
         self.IS_NOISE = True
         self.BIAS = 300
         self.past_window = deque(maxlen=int(self.SILENCE_SEC * self.RATE /
@@ -73,7 +81,7 @@ class Audition(Sensor):
         else:
             raise Exception("Unrecognized message.")
 
-    def setup_mic(self, seconds: str = 2) -> None:
+    def setup_mic(self, seconds: int = 2) -> None:
         """
         Sets up a THRESHOLD recording equal to the rms of the 20% largest bytes of a 2-second (default) signal recorded.
 
@@ -119,7 +127,8 @@ class Audition(Sensor):
                         channels=self.CHANNELS,
                         rate=self.RATE,
                         input=True,
-                        frames_per_buffer=self.CHUNK)
+                        frames_per_buffer=self.CHUNK,
+                        input_device_index=self.DEVICE_INDEX)
 
         return stream, p
 
