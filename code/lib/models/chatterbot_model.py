@@ -29,8 +29,7 @@ class Language(Model):
             agent_name,
             statement_comparison_function=levenshtein_distance,
             storage_adapter="chatterbot.storage.MongoDatabaseAdapter",
-            database_uri=
-            'mongodb+srv://arca:arca@arca-vfwrf.gcp.mongodb.net/test?retryWrites=true&w=majority',
+            database_uri=os.getenv("MONGODB_URI"),
             logic_adapters=logic_adapters,
             logger=self.logger)
         self.trainer = ChatterBotCorpusTrainer(self.chatbot)
