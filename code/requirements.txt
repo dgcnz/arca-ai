@@ -11,3 +11,4 @@ nltk
 scipy
 arrow
 dnspython
+python-levenshtein

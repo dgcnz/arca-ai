@@ -9,7 +9,6 @@ import string
 import re
 import os
 
-tokenize = ToktokTokenizer().tokenize
 pron_refl = ["me", "te", "se", "nos", "os"]
 pron_dobj = ["lo", "los", "la", "las"]
 enclitic_pat = re.compile(
@@ -18,6 +17,10 @@ DUCKLING_HOST = os.getenv("DUCKLING_HOST")
 DUCKLING_PORT = os.getenv("DUCKLING_PORT")
 print(DUCKLING_HOST, DUCKLING_PORT)
 DUCKLING_URL = f"{DUCKLING_HOST}:{DUCKLING_PORT}"
+
+
+def tokenize(s: str):
+    return ToktokTokenizer().tokenize(s)
 
 
 def untokenize(tokens):
@@ -75,6 +78,7 @@ def syntax_analyze(sent: str) -> Tuple[List, str]:
 
 
 def get_type_sentence(sent: str) -> str:
+    # TODO
     tokens = tokenize(sent)
     pass
 
@@ -97,7 +101,7 @@ class NLP(Interpreter):
         # tokenize
         tokens = tokenize(res)
 
-        # Remove all non-alohanumerical tokens and lowercase them
+        # Remove all non-alphanumerical tokens and lowercase them
         tokens = [word.lower() for word in tokens if word.isalnum()]
 
         # Put tokens together
