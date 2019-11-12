@@ -6,13 +6,13 @@ import wave
 from typing import List
 from lib.interpreters.speech_recognizer import SpeechRecognizer
 from lib.interpreters.nlp import normalize, tokenize, untokenize
-from levenshtein import jaro
+from Levenshtein import jaro
 from lib.utilities import settings  # for loading dotenv
 import pandas as pd
 
 
 def process(sr, wf):
-    chunk = os.getenv("CHUNK")
+    chunk = int(os.getenv("CHUNK"))
     data = wf.readframes(chunk)
     while data != b'':
         gen = sr.process(data)
@@ -29,14 +29,20 @@ def process(sr, wf):
     return None
 
 
-def compare(x, y) -> float:
+def compare(x, y):
+    if x is None:
+        return [0, x, y]
+
     x = normalize(x)
     x_tokens = [word.lower() for word in tokenize(x) if word.isalnum()]
 
     y = normalize(y)
     y_tokens = [word.lower() for word in tokenize(y) if word.isalnum()]
 
-    return jaro(untokenize(x_tokens), untokenize(y_tokens))
+    ppx = untokenize(x_tokens)
+    ppy = untokenize(y_tokens)
+
+    return [jaro(ppx, ppy), ppx, ppy]
 
 
 def test_sr(X: List[str], Y: List[str]):
@@ -48,24 +54,55 @@ def test_sr(X: List[str], Y: List[str]):
     sr = SpeechRecognizer("test_sr", "googlespeech")
     Yp = []
     accuracies = []
+    PPX = []
+    PPY = []
 
     for i, filename in enumerate(X):
         wf = wave.open(filename, 'rb')
         if wf.getframerate() != int(os.getenv("RATE")):
             raise Exception("RATE of recorded audio doesn't match mic RATE.")
         ans = process(sr, wf)
-        acc = compare(ans, Y[i])
+        acc, ppx, ppy = compare(ans, Y[i])
         Yp.append(ans)
         accuracies.append(acc)
+        PPX.append(ppx)
+        PPY.append(ppy)
 
-    raw = {'file': X, 'text': Y, 'guess': Yp, 'accuracy': accuracies}
+    raw = {
+        'file': X,
+        'text': Y,
+        'guess': Yp,
+        'norm_text': PPX,
+        'norm_y': PPY,
+        'accuracy': accuracies
+    }
     df = pd.DataFrame(raw)
 
     return df
 
 
 def main():
-    pass
+    tests_path = os.getcwd() + "/resources/tests/sr"
+    X = []
+    Y = []
+
+    temp = os.listdir(tests_path)
+    for i, test_folder in enumerate(temp):
+        print(i, test_folder)
+    i = int(input("Select index of your folder: "))
+    tests_path += f"/{temp[i]}"
+
+    print(tests_path)
+    print(os.listdir(tests_path))
+    for f in os.listdir(tests_path):
+        if f.endswith(".wav"):
+            X.append(os.path.join(tests_path, f))
+            basename = os.path.splitext(tests_path + "/" + f)[0]
+            with open(basename + ".txt") as g:
+                Y.append(g.readline())
+
+    df = test_sr(X, Y)
+    print(df)
 
 
 if __name__ == "__main__":

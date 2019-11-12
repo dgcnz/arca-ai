@@ -70,7 +70,16 @@ def get_descriptive_name(s: str):
 
 
 def main():
-    seconds = int(input("Enter record time (in seconds):"))
+    global TEST_FOLDER
+    TEST_FOLDER = os.getcwd() + "/resources/tests/sr"
+
+    temp = os.listdir(TEST_FOLDER)
+    for i, test_folder in enumerate(temp):
+        print(i, test_folder)
+    i = int(input("Select index of your folder: "))
+    TEST_FOLDER += f"/{temp[i]}"
+
+    seconds = int(input("Enter record time (in seconds): "))
     input("Press Enter when ready to record.")
 
     data = record(seconds)
