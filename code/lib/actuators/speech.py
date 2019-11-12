@@ -8,6 +8,11 @@ class Speech(Actuator):
     def __init__(self, name: str):
         super().__init__(name)
         self.logger = self.get_logger()
+        os_ = platform.system()
+        if os_ == "Linux":
+            self.program = "lib/utilities/pico_speak.py"
+         else 
+            self.program = "lib/utilities/speak.py"
 
     def do(self, action: Action) -> None:
         self.logger.info(f"Saying: {action.data}")
