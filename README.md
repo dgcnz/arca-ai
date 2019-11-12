@@ -1,3 +1,3 @@
 # ARCA AI
 
-A full AI Architecture for ARCA, an interdisciplinary project at UTEC.
+A Cognitive Architecture for ARCA, an interdisciplinary project at UTEC.
