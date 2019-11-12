@@ -9,3 +9,6 @@ flask
 numpy
 nltk
 scipy
+arrow
+dnspython
+python-levenshtein

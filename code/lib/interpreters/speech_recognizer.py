@@ -1,10 +1,10 @@
 from lib.interpreters.interpreter_base import Interpreter
 from lib.types import Identifier
 from typing import List, Generator, Any
-from os import path
 from pocketsphinx.pocketsphinx import Decoder
 from google.cloud import speech
 from google.oauth2 import service_account
+import os
 
 
 class SpeechRecognizer(Interpreter):
@@ -16,7 +16,7 @@ class SpeechRecognizer(Interpreter):
         self.setup()
 
     def setup(self) -> None:
-        self.RATE = 48000  # TODO: this is defined in Audition Sensor.
+        self.RATE = int(os.getenv("RATE"))
         self.setup_pocketsphinx()
 
         if (self.sr == "googlespeech"):
@@ -27,9 +27,9 @@ class SpeechRecognizer(Interpreter):
         self.MODELDIR = "resources/model"
 
         config = Decoder.default_config()
-        config.set_string('-hmm', path.join(self.MODELDIR, 'es-es'))
-        config.set_string('-lm', path.join(self.MODELDIR, 'es-es.lm'))
-        config.set_string('-dict', path.join(self.MODELDIR, 'es.dict'))
+        config.set_string('-hmm', os.path.join(self.MODELDIR, 'es-es'))
+        config.set_string('-lm', os.path.join(self.MODELDIR, 'es-es.lm'))
+        config.set_string('-dict', os.path.join(self.MODELDIR, 'es.dict'))
         config.set_string('-logfn', '/dev/null')
 
         self.decoder = Decoder(config)
@@ -59,6 +59,34 @@ class SpeechRecognizer(Interpreter):
         """Filtering"""
         return raw_data
 
+    def query_gs(self):
+        requests = (speech.types.StreamingRecognizeRequest(audio_content=chunk)
+                    for chunk in self.current_data)
+        responses = self.client.streaming_recognize(
+            config=self.streaming_config, requests=requests)
+        try:
+            response = next(responses)
+            data = response.results[0].alternatives[0].transcript
+            conf = response.results[0].alternatives[0].confidence
+        except Exception as e:
+            self.logger.info(f"{self.name}>> {e}")
+            conf = None
+            data = None
+        self.current_data.clear()
+        return data, conf
+
+    def query_ps(self):
+        try:
+            data = self.decoder.hyp().hypstr
+            conf = self.decoder.hyp().best_score
+            if data == "":
+                data = None
+        except Exception as e:
+            self.logger.info(f"{self.name}>> {e}")
+            conf = None
+            data = None
+        return data, conf
+
     def process(self, raw_data) -> Generator:
         self.decoder.process_raw(raw_data, False, False)
         cur_buf_is_speech = self.decoder.get_in_speech()
@@ -84,29 +112,9 @@ class SpeechRecognizer(Interpreter):
             yield True
             self.decoder.end_utt()
             if (self.sr == "googlespeech"):
-                requests = (speech.types.StreamingRecognizeRequest(
-                    audio_content=chunk) for chunk in self.current_data)
-                responses = self.client.streaming_recognize(
-                    config=self.streaming_config, requests=requests)
-                try:
-                    response = next(responses)
-                    data = response.results[0].alternatives[0].transcript
-                    conf = response.results[0].alternatives[0].confidence
-                except Exception as e:
-                    self.logger.info(f"{self.name}>> {e}")
-                    conf = None
-                    data = None
-                self.current_data.clear()
+                data, conf = self.query_gs()
             elif (self.sr == "pocketsphinx"):
-                try:
-                    data = self.decoder.hyp().hypstr
-                    conf = self.decoder.hyp().best_score
-                    if data == "":
-                        data = None
-                except Exception as e:
-                    self.logger.info(f"{self.name}>> {e}")
-                    conf = None
-                    data = None
+                data, conf = self.query_ps()
             self.logger.info(
                 f"{self.name}>> Heard DATA: '{data}' with confidence: {conf}.")
             self.decoder.start_utt()

@@ -1,3 +1,4 @@
+from lib.utilities import settings
 import time
 import signal
 import sys
@@ -10,9 +11,14 @@ from lib.actuators.speech import Speech
 # from lib.observers.web import WebInterface
 
 la = [{
-    'import_path': 'chatterbot.logic.BestMatch',
-    'default_response': 'Lo siento, no entendí.',
-    'maximum_similarity_threshold': 0.70
+    'import_path':
+    'chatterbot.logic.BestMatch',
+    'default_response':
+    'Lo siento, no entendí.',
+    'maximum_similarity_threshold':
+    0.70,
+    "statement_comparison_function":
+    "chatterbot.comparisons.levenshtein_distance"
 }]
 
 corpuses = [
@@ -55,7 +61,7 @@ def main():
     sr = SpeechRecognizer("sr", "googlespeech")
     nlp = NLP("nlp")
     lang = Language("language", "ARCA", la)
-    lang.train(corpuses)
+    # lang.train(corpuses)
     voice = Speech("speech")
 
     ARCA.add_component(hearing)
