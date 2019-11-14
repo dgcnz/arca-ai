@@ -33,6 +33,9 @@ def _parse_date(sent: str):
             ]:
                 precision = precedence[
                     precedence.index(ans[0]["value"]["grain"]) - 1]
+            else:
+                precision = precedence[
+                    precedence.index(ans[0]["value"]["grain"])]
         else:
             precision = None
 
