@@ -21,16 +21,14 @@ la = [{
     "chatterbot.comparisons.levenshtein_distance"
 }]
 
-corpuses = [
-    './resources/corpuses/spanish/',
-]
+# corpuses = ['resources/corpuses/ppr_spanish']
 
 ARCA = Agent("ARCA")
 
 
 def test_model():
     lang = Language("language", "ARCA", la)
-    lang.train(corpuses)
+    # lang.train(corpuses)
 
     while True:
         x = input("> ")
@@ -50,7 +48,8 @@ def signal_handler(sig, frame):
 
 
 def main():
-    # test_model()
+    test_model()
+    return
     # server = WebInterface("localhost", 8000)
     # server.activate()
 

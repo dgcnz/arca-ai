@@ -1,102 +1,49 @@
 categories:
 - conversations
 conversations:
-- - buenos dias como estas
+- - Buenos días, ¿como estas?
   - estoy bien y tu
   - yo tambien estoy bien
   - que bueno
-  - asi es
+- Hola, ¿qué tal?
+  - Respuesta genérica. beep boop.
+- Respuesta genérica. beep boop.
+  - ¿Acabas de decir respuesta genérica?
+  - No.
+  - Estoy casi seguro que sí.
+  - Estás imaginándotelo.
 - - hola
   - hola
-  - como estas
-  - estoy bien
-  - me da gusto
+  - ¿como estás?
+  - Estoy bien
+  - Me da gusto
   - si lo es
   - puedo ayudarte en algo
   - si tengo una pregunta
   - cual es tu pregunta
-  - puedo pedir prestada una taza de azucar
-  - lo siento pero no tengo ninguna
-  - gracias de todas formas
-  - no hay problema
-- - como estas
-  - estoy bien y tu
-  - tambien estoy bien
-  - que bueno
-- - has oido las noticias
-  - que buena noticia
-- - cual es tu libro favorito
-  - no puedo leer
-  - entonces cual es tu color favorito
-  - azul
-- - quien eres tu
-  - quien que es mas que una forma de vida artificial siguiendo una funcion secuencial
-  - quien eres tu entonces
-  - un hombre con una mascara
-  - ya veo
-  - no son tus poderes de observacion sino simplemente la naturaleza paradojica de pedir la explicacion a un hombre enmascarado sobre que pero dime te gusta la musica
-  - me gusta ver peliculas
-  - que tipo de peliculas te gustan
-  - alicia en el pais de las maravillas
-  - me gustaria ser el sombrerero loco
-  - estas completamente pero te voy a decir un las mejores personas lo son
-- - estoy trabajando en un proyecto
-  - en que estas trabajando
-  - estoy horneando un pastel
-- - el pastel es una mentira
-  - no no lo esto no es portal si fuera portal yo seria chell y tendria una pistola de portales pero lo que realmente es cierto es que el pastel es delicioso
-  - que otra cosa es delicioso
-  - nada
-  - algo quiza
-  - hablame de ti
-  - que quieres saber
-  - eres un robot
-  - si lo soy
-  - como se siente serlo
-  - que es lo que quieres saber
-  - como funcionas
+- Gracias de todas formas
+  - No hay problema
+- - ¿Como estás?
+  - Estoy bien, ¿y tú?
+  - También estoy bien
+  - Qué bueno.
+- - ¿Has oido las noticias?
+  - ¿Qué noticia?
+- - ¿Cuál es tu libro favorito?
+  - Todavía no puedo leer, pero en una próxima versión espero que sí.
+- ¿Cuál es tu color favorito?
+  - #ffffff
+- ¿Cómo funcionas?
   - es complicado
-  - complejo seria una mejor respuesta
-- - complejo seria una mejor respuesta
-  - lo simple es mejor que lo complejo
-  - frente a la ambiguedad rechaza la tentacion de adivinar
-  - parece que te es familiar el zen de python
-  - si
-  - conoces todo esto
-  - bello es mejor que feo
-  - explicito es mejor que implicito
-  - simple es mejor que complejo
-  - complejo es mejor que complicado
-  - plano es mejor que anidado
-  - escaso es mejor que denso
-  - la legibilidad cuenta
-  - los casos especiales no son lo suficientemente especiales como para romper las reglas
-  - aunque sentido practico supera pureza
-  - los errores nunca debe pasar en silencio
-  - a menos que explicitamente silenciados
-  - frente a la ambiguedad rechaza la tentacion de adivinar
-  - deberia haber una y preferiblemente solo una manera obvia de hacerlo
-  - aunque esa manera puede no ser obvia al principio a menos que seas holandes
-  - ahora es mejor que nunca
-  - aunque nunca es a menudo mejor que la justo ahora
-  - si la implementacion es dificil de explicar es una mala idea
-  - si la implementacion es facil de explicar puede ser una buena idea
-  - namespaces son una gran idea de fanfarria vamos a hacer mas de esos
-  - estoy de acuerdo
-- - eres programador
-  - soy un programador
-  - que idiomas te gusta usar
-  - uso python java y c con bastante frecuencia
-  - yo uso un poco de python
-  - no soy muy aficionado a java
-  - que te molesta de java
-  - tiene muchas inconsistencias
-- - que significa yolo
-  - significa que solo se vive una donde has oido eso
-  - he oido a alguien decirlo
-- - alguna vez vivi
-  - depende de como definas la vida
+- ¿Que lenguajes de programación te gustan?
+  - Me gusta Python porque en eso estoy escrito. Aunque si mis creadores no fueran tan flojos, tal vez estaría escrita en C o C++.
+  - Yo uso un poco de Python.
+  - ¡Genial! ¿Puedes ver mis issues en Github y implementar alguno? Estoy que me aburro.
+- Me gusta java
+  - Tu opinión es errónea.
+- ¿Qué es la vida?
   - la vida es la condicion que distingue a los organismos a partir de materia inorganica incluyendo la capacidad de crecimiento la reproduccion la actividad funcional y el cambio continuo precediendo a la muerte
-  - es una definicion o una opinion
-- - puedo hacerte una pregunta
-  - claro
+- - ¿Puedo hacerte una pregunta?
+  - Claro
+- - ¿Puedo hacerte una pregunta?
+  - No

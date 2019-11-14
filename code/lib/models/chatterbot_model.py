@@ -8,6 +8,16 @@ from chatterbot.comparisons import levenshtein_distance
 from chatterbot.logic import LogicAdapter
 from enum import Enum, auto
 import arrow
+import os
+"""
+IDEA:
+    differentiate between passive actions produced by stimulus and active actions:
+
+    active actions: go and bring me that cup:
+        active: legs
+        passive: voice ok
+        passive: nods
+"""
 
 
 class Command(Enum):
@@ -17,6 +27,9 @@ class Command(Enum):
     ANSWER = auto()
     CHAT = auto()
     REPEAT = auto()
+    WAKEUP = auto()
+    GREET = auto()
+    BRING = auto()
 
 
 class Language(Model):
@@ -50,12 +63,21 @@ class Language(Model):
             return Command.CHAT, self.chat
         if command == "repetir":
             return Command.REPEAT, self.repeat
+        if command == "despertar":
+            return Command.WAKEUP, self.wakeup
+        if command == "saludar":
+            return Command.GREET, self.greet
+        if command == "traer":
+            return Command.BRING, self.bring
         else:
             return Command.CHAT, self.chat
 
+    def wakeup(self, data: Any) -> str:
+        return []
+
     def chat(self, data: Any) -> str:
         ans = self.chatbot.get_response(data["text"])
-        return str(ans)
+        return (str(ans), 'speech')
 
     def say(self, data: Any) -> str:
         # get from memory or answer
@@ -76,7 +98,7 @@ class Language(Model):
                 ans.append(msg)
             if len(ans) == 0:
                 return f"No hay nada pendiente {date['text']}"
-            return ", ".join(ans)
+            return (", ".join(ans), 'speech')
 
         self.logger.error("NO USEFUL DATE WAS PROVIDED.")
         return self.chat(data)
@@ -85,7 +107,7 @@ class Language(Model):
         pass
 
     def repeat(self, data: Any) -> str:
-        return str(data["text"])
+        return (str(data["text"].split(" ", 1)[1]), 'voice')
 
     def remind(self, data: Any) -> None:
         if data["attr"]["datetime"] is not None:
@@ -112,6 +134,7 @@ class Language(Model):
     def get_tasks_from_precision(self, date: dict,
                                  precision: str) -> List[Tuple]:
         precedence = ["year", "month", "day", "hour", "minute", "second"]
+        # TODO: possible bug, check manana, hoy, etc precision
         index: int = precedence.index(precision)
         date = arrow.get(date["value"])
         ymdhm = date.format("YYYY MM DD HH mm").split(" ")
@@ -134,7 +157,7 @@ class Language(Model):
 
         cmd, fx = self.parse_command(ir.data["attr"]["command"])
 
-        raw_actions = [{"data": fx(ir.data), "command": cmd}]
+        raw_actions = fx(ir.data)
 
         return raw_actions
 

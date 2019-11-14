@@ -22,7 +22,7 @@ def process(sr, wf):
             return ans
         data = wf.readframes(chunk)
     for i in range(4):
-        gen = sr.process(bytes(chunk * bytes[0]))
+        gen = sr.process(bytes(chunk * [0]))
         if stop:
             ans = next(gen)
             return ans
@@ -102,7 +102,8 @@ def main():
                 Y.append(g.readline())
 
     df = test_sr(X, Y)
-    print(df)
+    score = round(df["accuracy"].mean(), 3)
+    df.to_csv(f"{tests_path}/results-{score}.csv")
 
 
 if __name__ == "__main__":
