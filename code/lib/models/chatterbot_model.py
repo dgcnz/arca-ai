@@ -8,6 +8,7 @@ from chatterbot.comparisons import levenshtein_distance
 from chatterbot.logic import LogicAdapter
 from enum import Enum, auto
 import arrow
+import os
 
 
 class Command(Enum):

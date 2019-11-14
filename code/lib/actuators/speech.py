@@ -2,7 +2,7 @@ from lib.actuators.actuator_base import Actuator
 from lib.types import Action, Identifier
 from subprocess import call
 from typing import List, Any
-
+import platform
 
 class Speech(Actuator):
     def __init__(self, name: str):
@@ -11,7 +11,7 @@ class Speech(Actuator):
         os_ = platform.system()
         if os_ == "Linux":
             self.program = "lib/utilities/pico_speak.py"
-         else 
+        else:
             self.program = "lib/utilities/speak.py"
 
     def do(self, action: Action) -> None:
