@@ -28,3 +28,5 @@ code/logs
 code/data
 code/database.sqlite3
 code/hs_err_pid7611.lo
+code/resources/tests/*
+code/resources/__pycache__/
