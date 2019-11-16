@@ -4,8 +4,7 @@ from subprocess import call
 from typing import List, Any
 import platform
 
-
-class Eyes(Actuator):
+class Neck(Actuator):
     def __init__(self, name: str):
         super().__init__(name)
         self.logger = self.get_logger()

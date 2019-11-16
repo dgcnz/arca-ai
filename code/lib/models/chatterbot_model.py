@@ -9,6 +9,7 @@ from chatterbot.logic import LogicAdapter
 from enum import Enum, auto
 import arrow
 import os
+import random
 """
 IDEA:
     differentiate between passive actions produced by stimulus and active actions:
@@ -30,7 +31,14 @@ class Command(Enum):
     WAKEUP = auto()
     GREET = auto()
     BRING = auto()
+    TELL = auto()
 
+jokes =[
+        "Mi vida. No, mentira.",
+        "beep boop.",
+        "Oh no, soy terrible haciendo chistes.",
+        "Un robot entra a un bar. ¿Qué? Ese es todo el chiste."
+        ]
 
 class Language(Model):
     def __init__(self, name: str, agent_name: str,
@@ -69,17 +77,54 @@ class Language(Model):
             return Command.GREET, self.greet
         if command == "traer":
             return Command.BRING, self.bring
+        if command == "contar":
+            return Command.TELL, self.tell
         else:
             return Command.CHAT, self.chat
 
     def wakeup(self, data: Any) -> str:
-        return []
+        return [
+                {"data": "1", "dest_ID": "arms"},
+                [
+                    {"data": "1", "dest_ID": "eyes"},
+                    {"data": "1", "dest_ID": "speech"},
+                ]
+                ]
 
-    def chat(self, data: Any) -> str:
+    def greet(self, data: Any):
+        return [
+                {"data": "1", "dest_ID": "wheels"},
+                [
+                    {"data":"1", "dest_ID":"eyes"},
+                    {"data": "Hola, mi nombre es ARCA. Bienvenidos al Open Day.", "dest_ID": "speech"},
+                ],
+                {"data": "1", "dest_ID": "arms"},
+                ]
+
+    def bring(self, data: Any):
+        return [{"data":"1", "dest_ID":"eyes"},
+                {"data": "1", "dest_ID": "arms"},
+                {"data": "1","dest_ID" : "wheels"},
+                ]
+
+    def chat(self, data: Any):
         ans = self.chatbot.get_response(data["text"])
-        return (str(ans), 'speech')
+        return [{"data":str(ans), "dest_ID":"speech"}]
 
-    def say(self, data: Any) -> str:
+    def tell(self, data: Any):
+        task = data["attr"]["task"]
+        if task in ["un chiste", "un chongo", "una broma", "chiste", "chongo", "broma"]:
+            ans = random.choice(jokes)
+            return [
+                    {"data": str(ans), "dest_ID": "speech"},
+                    [
+                        {"data": "8", "dest_ID": "arms"},
+                        {"data": "8", "dest_ID": "eyes"}
+                    ]
+                    ]
+        return self.chat(data)
+
+    def say(self, data: Any):
         # get from memory or answer
 
         date = data["attr"]["datetime"]
@@ -98,7 +143,8 @@ class Language(Model):
                 ans.append(msg)
             if len(ans) == 0:
                 return f"No hay nada pendiente {date['text']}"
-            return (", ".join(ans), 'speech')
+            return [{"data":", ".join(ans), "dest_ID":'speech'},
+                    {"data": "4", "dest_ID": "eyes"}]
 
         self.logger.error("NO USEFUL DATE WAS PROVIDED.")
         return self.chat(data)
@@ -107,7 +153,7 @@ class Language(Model):
         pass
 
     def repeat(self, data: Any) -> str:
-        return (str(data["text"].split(" ", 1)[1]), 'voice')
+        return [{"data":str(data["text"].split(" ", 1)[1]), "dest_ID":'speech'}]
 
     def remind(self, data: Any) -> None:
         if data["attr"]["datetime"] is not None:
@@ -118,9 +164,9 @@ class Language(Model):
             self.logger.info("NO DATE WAS PROVIDED.")
         # put value into memory at date
 
-        return None
+        return [{"data":"3", "dest_ID":"eyes"}]
 
-    def remember(self, date: str, subj: str):
+    def remember(self, date: str, subj: str) -> None:
         # 2019-11-04T16:41:00.000-05:00
         d = arrow.get(date)
         year, month, day, hour, minute = d.format("YYYY MM DD HH mm").split(
@@ -130,6 +176,7 @@ class Language(Model):
             self.memory[year][month][day][hour][minute].append(subj)
         except Exception:
             self.memory[year][month][day][hour][minute] = [subj]
+        return None
 
     def get_tasks_from_precision(self, date: dict,
                                  precision: str) -> List[Tuple]:
@@ -152,7 +199,7 @@ class Language(Model):
         """
         raw_actions: List[Any] = []
 
-        if ir.data["text"] is None:
+        if ir is None or ir.data is None or ir.data["text"] is None:
             return []
 
         cmd, fx = self.parse_command(ir.data["attr"]["command"])

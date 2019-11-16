@@ -8,6 +8,10 @@ from lib.interpreters.nlp import NLP
 from lib.interpreters.speech_recognizer import SpeechRecognizer
 from lib.models.chatterbot_model import Language
 from lib.actuators.speech import Speech
+from lib.actuators.neck import Neck
+from lib.actuators.arms import Arms
+from lib.actuators.wheels import Wheels
+from lib.actuators.eyes import Eyes
 # from lib.observers.web import WebInterface
 
 la = [{
@@ -48,8 +52,6 @@ def signal_handler(sig, frame):
 
 
 def main():
-    test_model()
-    return
     # server = WebInterface("localhost", 8000)
     # server.activate()
 
@@ -61,18 +63,31 @@ def main():
     nlp = NLP("nlp")
     lang = Language("language", "ARCA", la)
     # lang.train(corpuses)
-    voice = Speech("speech")
+    speech = Speech("speech")
+    arms = Arms("arms")
+    wheels = Wheels("wheels")
+    eyes = Eyes("eyes")
+    neck = Neck("neck")
+
 
     ARCA.add_component(hearing)
     ARCA.add_component(nlp)
     ARCA.add_component(sr)
     ARCA.add_component(lang)
-    ARCA.add_component(voice)
+    ARCA.add_component(speech)
+    ARCA.add_component(arms)
+    ARCA.add_component(wheels)
+    ARCA.add_component(eyes)
+    ARCA.add_component(neck)
 
     ARCA.associate(hearing, sr)
     ARCA.associate(sr, nlp)
     ARCA.associate(nlp, lang)
-    ARCA.associate(lang, voice)
+    ARCA.associate(lang, speech)
+    ARCA.associate(lang, arms)
+    ARCA.associate(lang, wheels)
+    ARCA.associate(lang, eyes)
+    ARCA.associate(lang, neck)
 
     ARCA.interpreters["sr"].listen()
     ARCA.interpreters["nlp"].listen()

@@ -13,10 +13,7 @@ pron_refl = ["me", "te", "se", "nos", "os"]
 pron_dobj = ["lo", "los", "la", "las"]
 enclitic_pat = re.compile(
     f".*(?={'|'.join(pron_refl)})(?={'|'.join(pron_dobj)})?")
-DUCKLING_HOST = os.getenv("DUCKLING_HOST")
-DUCKLING_PORT = os.getenv("DUCKLING_PORT")
-print(DUCKLING_HOST, DUCKLING_PORT)
-DUCKLING_URL = f"{DUCKLING_HOST}:{DUCKLING_PORT}"
+NLP_API_URI = os.getenv("NLP_API_URI")
 
 
 def tokenize(s: str):
@@ -37,50 +34,6 @@ def normalize(string: str):
                                 string).encode('ascii',
                                                'ignore').decode('utf-8')
     return res
-
-
-def parse_date(sent: str):
-    r = requests.get(DUCKLING_URL, params={'sent': sent})
-    if r.status_code == 200:
-        return r.json()
-    raise Exception(f"DUCKLING server is not responding. {DUCKLING_URL}")
-
-
-def is_imperative(word: str):
-    base = enclitic_pat.match(word)
-    if base:
-        txt = base.group()
-        txt = normalize(txt)
-        ans = parse(txt, lemmata=True).split('/')
-        return True, '/'.join([word] + ans[1:])
-    return False, None
-
-
-def syntax_analyze(sent: str) -> Tuple[List, str]:
-    parsed_list = []
-    command = None
-    if sent is not None:
-        parsed = parse(sent, lemmata=True)
-        parsed_list = parsed.split(" ")
-        for s in split(parsed)[0]:
-            if s.index == 0 and s.type != "VB":
-                flag, fixed = is_imperative(str(s))
-                if flag:
-                    parsed_list[s.index] = fixed
-                    command = fixed.split("/")[-1]
-            if s.index == 0 and s.type == "VB":
-                if conjugate(str(s), PRESENT, 2, SG,
-                             mood=IMPERATIVE) == str(s).lower():
-                    command = str(s).lower()
-    if command is None:
-        command = "conversar"
-    return parsed_list, command
-
-
-def get_type_sentence(sent: str) -> str:
-    # TODO
-    tokens = tokenize(sent)
-    pass
 
 
 class NLP(Interpreter):
@@ -110,30 +63,14 @@ class NLP(Interpreter):
 
     def process(self, raw_data) -> Generator:
         yield True
-        syntax, command, date, task = [None, None, None, None]
+        r = requests.get(f"{NLP_API_URI}/nlp/process", params={'sent': raw_data})
 
-        if raw_data is not None:
-            syntax, command = syntax_analyze(raw_data)
-            date = parse_date(raw_data)
-            try:
-                task = raw_data.replace("" if date is None else date["text"],
-                                        "")
-                task = task.split(" ",
-                                  1)[1] if command != "conversar" else task
-            except Exception:
-                pass
-
-        res = {
-            "text": raw_data,
-            "attr": {
-                "datetime": date,
-                "command": command,
-                "syntax": syntax,
-                "task": task
-            }
-        }
-        self.logger.info(res)
-        yield res
+        if r.status_code == 200:
+            self.logger.info(r.json())
+            yield r.json()
+        else:
+            self.logger.info("Empty or invalid sentence")
+            yield None
         return
 
     def pass_msg(self, msg: str) -> None:

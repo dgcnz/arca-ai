@@ -18,6 +18,8 @@ class Identifier:
 
     def to_tuple(self):
         return self.name, self.category
+    def __str__(self):
+        return f"(ID: {self.name}, {self.category})"
 
 
 class Information:
@@ -36,7 +38,7 @@ class Component(ABC):
     def __init__(self, name):
         self.name: str = name
         self.destinations_ID: List[Identifier] = []
-        self.sendID: Callable = None
+        self.sendID: Callable
 
     def add_destination_ID(self, dest_ID: Identifier):
         self.destinations_ID.append(dest_ID)
@@ -83,6 +85,8 @@ class Action(Information):
         self.src = src
         self.dest = dest
         self.data = data
+    def __str__(self):
+        return f"{self.data}, {self.src}, {self.dest}"
 
 
 class NestedDefaultDict(defaultdict):
