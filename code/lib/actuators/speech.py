@@ -16,7 +16,7 @@ class Speech(Actuator):
 
     def do(self, action: Action) -> None:
         self.logger.info(f"Saying: {action.data}")
-        call(["python", "lib/utilities/speak.py", action.data["data"]])
+        call(["python", self.program, action.data["data"]])
 
     def pass_msg(self, msg: str) -> None:
         pass

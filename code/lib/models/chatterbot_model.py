@@ -142,7 +142,7 @@ class Language(Model):
                 msg = f"{a.humanize(locale='es')}: {task}"
                 ans.append(msg)
             if len(ans) == 0:
-                return f"No hay nada pendiente {date['text']}"
+                return [{"data": f"No hay nada pendiente {date['text']}", "dest_ID": 'speech'}]
             return [{"data":", ".join(ans), "dest_ID":'speech'},
                     {"data": "4", "dest_ID": "eyes"}]
 
