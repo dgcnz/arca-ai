@@ -107,6 +107,9 @@ class Audition(Sensor):
         values = sorted(values, reverse=True)
         self.THRESHOLD = sum(values[:int(num_samples * 0.2)]) / int(
             num_samples * 0.2) - self.BIAS
+        if (self.THRESHOLD < 600):
+            self.THRESHOLD = 600
+            
 
         self.logger.info(f"Threshold set at {self.THRESHOLD}.")
         stream.close()
