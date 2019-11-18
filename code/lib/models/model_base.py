@@ -17,7 +17,7 @@ class Model(Component, ABC):
                     dest_ID = r["dest_ID"]
                     if data is not None or data != "":
                         # TODO: dont hardcode destination category
-                        args = Action(self.dumpID(), Identifier(dest_ID, "Actuator"), data)
+                        args = Action(self.dumpID(), Identifier(dest_ID, "Actuator"), r)
                         print("ARGS:", args)
                         threads[i] = threading.Thread(target=self.sendID,
                                                       args=(args,)
