@@ -12,3 +12,4 @@ scipy
 arrow
 dnspython
 python-levenshtein
+pip install smbus

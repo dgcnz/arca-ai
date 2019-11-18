@@ -4,6 +4,12 @@ from subprocess import call
 from typing import List, Any
 import platform
 
+OS_ = platform.system()
+if OS_ == "Linux":
+    import smbus
+    bus = smbus.SMBus(1)
+    ADDRESS = 0x04
+
 
 class Eyes(Actuator):
     def __init__(self, name: str):
@@ -12,6 +18,9 @@ class Eyes(Actuator):
 
     def do(self, action: Action) -> None:
         self.logger.info(f"{action.data}")
+        if OS_ == "Linux":
+            bus.write_byte(ADDRESS, int(action.data["data"]))
+
 
     def pass_msg(self, msg: str) -> None:
         pass
