@@ -40,9 +40,21 @@ jokes =[
         "Un robot entra a un bar. ¿Qué? Ese es todo el chiste."
         ]
 
+la = [{
+    'import_path':
+    'chatterbot.logic.BestMatch',
+    'default_response':
+    'Lo siento, no entendí.',
+    'maximum_similarity_threshold':
+    0.70,
+    "statement_comparison_function":
+    " chatterbot.comparisons.levenshtein_distance",
+    "response_selection_method":
+    "chatterbot.response_selection.get_most_frequent_response"
+}]
+
 class Language(Model):
-    def __init__(self, name: str, agent_name: str,
-                 logic_adapters: List[LogicAdapter]):
+    def __init__(self, name: str, agent_name: str):
         super().__init__(name)
 
         self.logger = self.get_logger()
@@ -51,7 +63,7 @@ class Language(Model):
             statement_comparison_function=levenshtein_distance,
             storage_adapter="chatterbot.storage.MongoDatabaseAdapter",
             database_uri=os.getenv("MONGODB_URI"),
-            logic_adapters=logic_adapters,
+            logic_adapters=la,
             logger=self.logger)
         self.trainer = ChatterBotCorpusTrainer(self.chatbot)
         self.memory = NestedDefaultDict()

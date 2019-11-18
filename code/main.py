@@ -14,16 +14,6 @@ from lib.actuators.wheels import Wheels
 from lib.actuators.eyes import Eyes
 # from lib.observers.web import WebInterface
 
-la = [{
-    'import_path':
-    'chatterbot.logic.BestMatch',
-    'default_response':
-    'Lo siento, no entendí.',
-    'maximum_similarity_threshold':
-    0.70,
-    "statement_comparison_function":
-    "chatterbot.comparisons.levenshtein_distance"
-}]
 
 # corpuses = ['resources/corpuses/ppr_spanish']
 
@@ -31,7 +21,7 @@ ARCA = Agent("ARCA")
 
 
 def test_model():
-    lang = Language("language", "ARCA", la)
+    lang = Language("language", "ARCA")
     # lang.train(corpuses)
 
     while True:
@@ -61,7 +51,7 @@ def main():
     hearing = Audition("mic_0")
     sr = SpeechRecognizer("sr", "googlespeech")
     nlp = NLP("nlp")
-    lang = Language("language", "ARCA", la)
+    lang = Language("language", "ARCA")
     # lang.train(corpuses)
     speech = Speech("speech")
     arms = Arms("arms")
