@@ -6,6 +6,7 @@ from chatterbot.trainers import ChatterBotCorpusTrainer
 from chatterbot import ChatBot
 from chatterbot.comparisons import levenshtein_distance
 from chatterbot.logic import LogicAdapter
+from chatterbot import comparisons, response_selection
 from enum import Enum, auto
 import arrow
 import os
@@ -47,10 +48,8 @@ la = [{
     'Lo siento, no entendí.',
     'maximum_similarity_threshold':
     0.70,
-    "statement_comparison_function":
-    " chatterbot.comparisons.levenshtein_distance",
-    "response_selection_method":
-    "chatterbot.response_selection.get_most_frequent_response"
+    "statement_comparison_function": comparisons.levenshtein_distance,
+    "response_selection_method": response_selection.get_most_frequent_response
 }]
 
 class Language(Model):
@@ -60,6 +59,7 @@ class Language(Model):
         self.logger = self.get_logger()
         self.chatbot = ChatBot(
             agent_name,
+            read_only=True,
             statement_comparison_function=levenshtein_distance,
             storage_adapter="chatterbot.storage.MongoDatabaseAdapter",
             database_uri=os.getenv("MONGODB_URI"),

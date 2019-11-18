@@ -40,7 +40,6 @@ def train_model(corpus: str = None):
   
 if __name__ == "__main__":
     args = sys.argv
-    all_logging_disabled()
     if len(args) > 1:
         for arg in args[1:]:
             train_model(arg)
