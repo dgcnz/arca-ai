@@ -33,6 +33,7 @@ class Audition(Sensor):
         self.WIDTH = int(os.getenv("WIDTH"))
         self.FORMAT = int(os.getenv("FORMAT"))
         self.CHANNELS = int(os.getenv("CHANNELS"))
+        self._p = None
         print(self.CHUNK, self.RATE, self.WIDTH, self.FORMAT, self.CHANNELS)
 
         try:
@@ -76,10 +77,10 @@ class Audition(Sensor):
         """
         if msg == "PAUSE":
             self.pause()
-            self.__stream.close()
+            self._stream.close()
         elif msg == "RESUME":
             self.resume()
-            self.__stream = self.get_stream()
+            self._stream = self.get_stream()
         else:
             raise Exception("Unrecognized message.")
 
@@ -126,7 +127,7 @@ class Audition(Sensor):
             stream: instance of pyaudio.Pyaudio.open()
             p: instance of pyaudio.Pyaudio
         """
-        stream = self.__p.open(format = self.FORMAT,
+        stream = self._p.open(format = self.FORMAT,
                         channels=self.CHANNELS,
                         rate=self.RATE,
                         input=True,
@@ -161,7 +162,7 @@ class Audition(Sensor):
         """
 
         # Reads from pyaudio.stream
-        data = self.__stream.read(self.CHUNK, exception_on_overflow=False)
+        data = self._stream.read(self.CHUNK, exception_on_overflow=False)
         # Takes 0.2 biggest values
         data_np = bytes_to_np(data)
         data_np = np_to_bytes(np.sort(data_np)[-int(0.2 * data_np.size):])
@@ -198,14 +199,14 @@ class Audition(Sensor):
             return None
 
     def setup_perceiver(self) -> None:
+        self._p = pyaudio.PyAudio()
         self.setup_mic()
-        self.__p = pyaudio.Pyaudio()
-        self.__stream = self.get_stream()
+        self._stream = self.get_stream()
 
     def close_perceiver(self) -> None:
-        self.__stream.stop_stream()
-        self.__stream.close()
-        self.__p.terminate()
+        self._stream.stop_stream()
+        self._stream.close()
+        self._p.terminate()
 
     def dump_history(self, filename: str, data: List[Any]) -> None:
         self.logger.info(f"Dumping history into {filename}.wav.")
