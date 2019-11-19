@@ -13,4 +13,4 @@ arrow
 dnspython
 python-levenshtein
 smbus
-serial
+pyserial
