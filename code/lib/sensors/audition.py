@@ -41,7 +41,7 @@ class Audition(Sensor):
             self.DEVICE_INDEX = None
 
         self.SILENCE_FRAMES = 0
-        self.SILENCE_SEC = 2
+        self.SILENCE_SEC = 1
         self.IS_NOISE = True
         self.BIAS = 300
         self.past_window = deque(maxlen=int(self.SILENCE_SEC * self.RATE /
@@ -108,7 +108,7 @@ class Audition(Sensor):
         self.THRESHOLD = sum(values[:int(num_samples * 0.2)]) / int(
             num_samples * 0.2) - self.BIAS
         if (self.THRESHOLD < 600):
-            self.THRESHOLD = 600
+            self.THRESHOLD = 1000
             
 
         self.logger.info(f"Threshold set at {self.THRESHOLD}.")
