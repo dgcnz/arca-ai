@@ -96,7 +96,7 @@ class Language(Model):
 
     def wakeup(self, data: Any) -> str:
         return [
-                {"data": "1", "dest_ID": "arms"},
+                {"data": "1,0.0", "dest_ID": "arms"},
                 [
                     {"data": "1", "dest_ID": "eyes"},
                     # {"data": "mmmhhhh", "dest_ID": "speech"},
@@ -110,12 +110,12 @@ class Language(Model):
                     {"data":"1", "dest_ID":"eyes"},
                     {"data": "Hola, mi nombre es ARCA. Bienvenidos al Open Day.", "dest_ID": "speech"},
                 ],
-                {"data": "1", "dest_ID": "arms"},
+                {"data": "1,0.0", "dest_ID": "arms"},
                 ]
 
     def bring(self, data: Any):
         return [{"data":"1", "dest_ID":"eyes"},
-                {"data": "1", "dest_ID": "arms"},
+                {"data": "1,0.0", "dest_ID": "arms"},
                 {"data": "1","dest_ID" : "wheels"},
                 ]
 
@@ -130,8 +130,8 @@ class Language(Model):
             return [
                     {"data": str(ans), "dest_ID": "speech"},
                     [
-                        {"data": "8", "dest_ID": "arms"},
-                        {"data": "8", "dest_ID": "eyes"}
+                        {"data": "8,0.0", "dest_ID": "arms"},
+                        {"data": "8,0.0", "dest_ID": "eyes"}
                     ]
                     ]
         return self.chat(data)
