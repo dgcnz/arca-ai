@@ -131,7 +131,7 @@ class Language(Model):
                     {"data": str(ans), "dest_ID": "speech"},
                     [
                         {"data": "8,0.0", "dest_ID": "arms"},
-                        {"data": "8", "dest_ID": "eyes"}
+                        {"data": "8,0.0", "dest_ID": "eyes"}
                     ]
                     ]
         return self.chat(data)

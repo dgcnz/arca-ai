@@ -162,7 +162,11 @@ class Audition(Sensor):
         """
 
         # Reads from pyaudio.stream
-        data = self._stream.read(self.CHUNK, exception_on_overflow=False)
+        try:
+            data = self._stream.read(self.CHUNK, exception_on_overflow=False)
+        except OSError:
+            return None
+
         # Takes 0.2 biggest values
         data_np = bytes_to_np(data)
         data_np = np_to_bytes(np.sort(data_np)[-int(0.2 * data_np.size):])
