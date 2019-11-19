@@ -52,6 +52,7 @@ class Sensor(Component, ABC):
     def pause(self):
         self.wait_event.clear()
         self.status = Status.PAUSED
+        self.reset_cache()
 
     def check_status(self):
         self.logger.info(f"SENSOR.IS_ALIVE(): {self.__perceiver.is_alive()}")
@@ -74,6 +75,10 @@ class Sensor(Component, ABC):
 
     @abstractmethod
     def read_input(self) -> Any:
+        pass
+
+    @abstractmethod
+    def reset_cache(self) -> Any:
         pass
 
     @abstractmethod

@@ -135,6 +135,11 @@ class Audition(Sensor):
 
         return stream, p
 
+    def reset_cache(self) -> None:
+        self.SILENCE_FRAMES = 0
+        self.IS_NOISE = True
+        self.past_window.clear()
+        
     def read_input(self) -> Any:
         """
         Reads a self.CHUNK from self.stream and returns it if its rms
@@ -181,7 +186,6 @@ class Audition(Sensor):
                 f"RMS Sorted: {rms}\t threshold: {self.THRESHOLD}\t is_valid: False"
             )
 
-            self.past_window.append(data)
             if not self.IS_NOISE:
                 self.SILENCE_FRAMES += 1
                 if (self.SILENCE_FRAMES * self.CHUNK /
@@ -189,6 +193,8 @@ class Audition(Sensor):
                     self.IS_NOISE = True
                     return bytes([0] * self.CHUNK * 4)
                 return data
+            else:
+                self.past_window.append(data)
             return None
 
     def setup_perceiver(self) -> None:
