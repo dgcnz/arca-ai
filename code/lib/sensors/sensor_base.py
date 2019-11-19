@@ -48,6 +48,7 @@ class Sensor(Component, ABC):
     def resume(self):
         self.wait_event.set()
         self.status = Status.RUNNING
+        self.reset_cache()
 
     def pause(self):
         self.wait_event.clear()

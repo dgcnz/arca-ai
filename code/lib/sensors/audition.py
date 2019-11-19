@@ -76,8 +76,10 @@ class Audition(Sensor):
         """
         if msg == "PAUSE":
             self.pause()
+            self.__stream.close()
         elif msg == "RESUME":
             self.resume()
+            self.__stream = self.get_stream()
         else:
             raise Exception("Unrecognized message.")
 
@@ -91,7 +93,7 @@ class Audition(Sensor):
         self.logger.info(
             "Setting up Microphone THRESHOLD. Please say something to adjust its sensitivity."
         )
-        stream, p = self.get_stream()
+        stream = self.get_stream()
         values = []
         num_samples = int(self.RATE / self.CHUNK * seconds)
 
@@ -113,7 +115,6 @@ class Audition(Sensor):
 
         self.logger.info(f"Threshold set at {self.THRESHOLD}.")
         stream.close()
-        p.terminate()
 
     def get_stream(self):
         """Helper function to open a pyaudio stream.
@@ -125,15 +126,14 @@ class Audition(Sensor):
             stream: instance of pyaudio.Pyaudio.open()
             p: instance of pyaudio.Pyaudio
         """
-        p = pyaudio.PyAudio()
-        stream = p.open(format=self.FORMAT,
+        stream = self.__p.open(format = self.FORMAT,
                         channels=self.CHANNELS,
                         rate=self.RATE,
                         input=True,
                         frames_per_buffer=self.CHUNK,
                         input_device_index=self.DEVICE_INDEX)
 
-        return stream, p
+        return stream
 
     def reset_cache(self) -> None:
         self.SILENCE_FRAMES = 0
@@ -199,7 +199,8 @@ class Audition(Sensor):
 
     def setup_perceiver(self) -> None:
         self.setup_mic()
-        self.__stream, self.__p = self.get_stream()
+        self.__p = pyaudio.Pyaudio()
+        self.__stream = self.get_stream()
 
     def close_perceiver(self) -> None:
         self.__stream.stop_stream()
