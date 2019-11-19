@@ -1,7 +1,8 @@
 from lib.actuators.actuator_base import Actuator
 from lib.types import Action, Identifier
-from subprocess import call
+from subprocess import run
 from typing import List, Any
+import time
 import platform
 
 class Speech(Actuator):
@@ -16,7 +17,9 @@ class Speech(Actuator):
 
     def do(self, action: Action) -> None:
         self.logger.info(f"Saying: {action.data}")
-        call(["python", self.program, action.data["data"]])
+        run(["python", self.program, action.data["data"]])
+        self.logger.info(f"Done.")
+        time.sleep(0.5)
 
     def pass_msg(self, msg: str) -> None:
         pass
