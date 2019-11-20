@@ -179,8 +179,7 @@ class Audition(Sensor):
 
         if data != b'' and rms >= self.THRESHOLD:
             self.logger.info(
-                f"RMS Sorted: {rms}\t threshold: {self.THRESHOLD}\t is_valid: True"
-            )
+                    f"RMS Sorted: {rms}\t threshold: {self.THRESHOLD}\t is_valid: True\t SILENCE_SEC: {self.SILENCE_FRAMES * self.CHUNK /self.RATE}")
             self.SILENCE_FRAMES = 0
 
             if self.IS_NOISE:
@@ -192,15 +191,15 @@ class Audition(Sensor):
             return data
         else:
             self.logger.info(
-                f"RMS Sorted: {rms}\t threshold: {self.THRESHOLD}\t is_valid: False"
-            )
+                    f"RMS Sorted: {rms}\t threshold: {self.THRESHOLD}\t is_valid: False\t SILENCE_SEC: {self.SILENCE_FRAMES * self.CHUNK /self.RATE}")
 
             if not self.IS_NOISE:
                 self.SILENCE_FRAMES += 1
                 if (self.SILENCE_FRAMES * self.CHUNK /
                         self.RATE) >= self.SILENCE_SEC:
                     self.IS_NOISE = True
-                    return bytes([0] * self.CHUNK * 4)
+                    self.logger.info(f"\t\tSENDING BLANK PAD. TRYING TO FORCE RESET.")
+                    return bytes([0] * self.CHUNK * 8)
                 return data
             else:
                 self.past_window.append(data)

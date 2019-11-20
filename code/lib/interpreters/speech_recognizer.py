@@ -17,6 +17,7 @@ class SpeechRecognizer(Interpreter):
 
     def setup(self) -> None:
         self.RATE = int(os.getenv("RATE"))
+        self.CHUNK = int(os.getenv("CHUNK"))
         self.setup_pocketsphinx()
 
         if (self.sr == "googlespeech"):
@@ -93,20 +94,12 @@ class SpeechRecognizer(Interpreter):
         data = None
         self.logger.info(
             f"prev: {self.prev_buf_is_speech}, current: {cur_buf_is_speech}")
+        force_speech = False
+        if raw_data == bytes([0] * self.CHUNK * 8):
+            force_speech = True
+            self.logger.info("RECEIVED FORCE STOP")
 
-        if not self.prev_buf_is_speech and cur_buf_is_speech:
-            # Now in speech -> Start listening
-            self.current_data.append(raw_data)
-            self.prev_buf_is_speech = cur_buf_is_speech
-            yield False
-
-        elif self.prev_buf_is_speech and cur_buf_is_speech:
-            # Still in speech -> Keep on listening
-            self.current_data.append(raw_data)
-            self.prev_buf_is_speech = cur_buf_is_speech
-            yield False
-
-        elif self.prev_buf_is_speech and not cur_buf_is_speech:
+        if force_speech or self.prev_buf_is_speech and not cur_buf_is_speech:
             # No longer in speech -> stop listening and process
             self.logger.info("No longer in speech, yielding True.")
             yield True
@@ -119,6 +112,18 @@ class SpeechRecognizer(Interpreter):
                 f"{self.name}>> Heard DATA: '{data}' with confidence: {conf}.")
             self.decoder.start_utt()
             self.prev_buf_is_speech = cur_buf_is_speech
+        elif not self.prev_buf_is_speech and cur_buf_is_speech:
+            # Now in speech -> Start listening
+            self.current_data.append(raw_data)
+            self.prev_buf_is_speech = cur_buf_is_speech
+            yield False
+
+        elif self.prev_buf_is_speech and cur_buf_is_speech:
+            # Still in speech -> Keep on listening
+            self.current_data.append(raw_data)
+            self.prev_buf_is_speech = cur_buf_is_speech
+            yield False
+
         else:
             self.prev_buf_is_speech = cur_buf_is_speech
             yield False
