@@ -107,7 +107,7 @@ class Audition(Sensor):
         for i in range(num_samples):
             temp = stream.read(self.CHUNK, exception_on_overflow=False)
             if self.CHANNELS > 1:
-                temp = temp[0::self.CHANNELS]
+                temp = (np.fromstring(temp, dtype=np.int16)[0::self.CHANNELS]).tostring()
             rms = audioop.rms(temp, self.WIDTH)
             values.append(rms)
             self.logger.info(f"RMS: {rms:<5}")
