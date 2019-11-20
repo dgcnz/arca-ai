@@ -221,7 +221,7 @@ class Audition(Sensor):
     def dump_history(self, filename: str, data: List[Any]) -> None:
         self.logger.info(f"Dumping history into {filename}.wav.")
         with wave.open(f"{filename}.wav", "wb") as waveFile:
-            waveFile.setnchannels(self.CHANNELS)
+            waveFile.setnchannels(1)
             waveFile.setsampwidth(self.WIDTH)
             waveFile.setframerate(self.RATE)
             waveFile.writeframes(b''.join(data))
