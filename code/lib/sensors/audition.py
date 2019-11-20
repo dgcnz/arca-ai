@@ -81,9 +81,9 @@ class Audition(Sensor):
         """
         if msg == "PAUSE":
             self.pause()
-            self._stream.stop_stream()
+            # self._stream.stop_stream()
         elif msg == "RESUME":
-            self._stream.start_stream()
+            # self._stream.start_stream()
             self.resume()
         else:
             raise Exception("Unrecognized message.")
@@ -115,7 +115,7 @@ class Audition(Sensor):
         self.THRESHOLD = sum(values[:int(num_samples * 0.2)]) / int(
             num_samples * 0.2) - self.BIAS
         if (self.THRESHOLD < 600):
-            self.THRESHOLD = 1000
+            self.THRESHOLD = 800
 
         self.logger.info(f"Threshold set at {self.THRESHOLD}.")
         stream.close()
@@ -199,7 +199,7 @@ class Audition(Sensor):
                         self.RATE) >= self.SILENCE_SEC:
                     self.IS_NOISE = True
                     self.logger.info(f"\t\tSENDING BLANK PAD. TRYING TO FORCE RESET.")
-                    return bytes([0] * self.CHUNK * 8)
+                    return bytes([0] * self.CHUNK * 4)
                 return data
             else:
                 self.past_window.append(data)

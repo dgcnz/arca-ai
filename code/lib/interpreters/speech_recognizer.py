@@ -94,9 +94,8 @@ class SpeechRecognizer(Interpreter):
         data = None
         self.logger.info(
             f"prev: {self.prev_buf_is_speech}, current: {cur_buf_is_speech}")
-        force_speech = False
-        if raw_data == bytes([0] * self.CHUNK * 8):
-            force_speech = True
+        if raw_data == bytes([0] * self.CHUNK * 4):
+            self.force_speech = True
             self.logger.info("RECEIVED FORCE STOP")
 
         if force_speech or self.prev_buf_is_speech and not cur_buf_is_speech:
