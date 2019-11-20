@@ -35,8 +35,7 @@ class Command(Enum):
     TELL = auto()
 
 jokes =[
-        "Mi vida. No, mentira.",
-        "beep boop.",
+        "bip bup.",
         "Oh no, soy terrible haciendo chistes.",
         "Un robot entra a un bar. ¿Qué? Ese es todo el chiste."
         ]
