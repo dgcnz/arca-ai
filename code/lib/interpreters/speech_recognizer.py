@@ -94,11 +94,13 @@ class SpeechRecognizer(Interpreter):
         data = None
         self.logger.info(
             f"prev: {self.prev_buf_is_speech}, current: {cur_buf_is_speech}")
-        if raw_data == bytes([0] * self.CHUNK * 4):
-            self.force_speech = True
+
+        force_speech = False
+        if raw_data == bytes([0] * self.CHUNK * 16):
+            force_speech = True
             self.logger.info("RECEIVED FORCE STOP")
 
-        if force_speech or self.prev_buf_is_speech and not cur_buf_is_speech:
+        if force_speech or (self.prev_buf_is_speech and not cur_buf_is_speech):
             # No longer in speech -> stop listening and process
             self.logger.info("No longer in speech, yielding True.")
             yield True

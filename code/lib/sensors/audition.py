@@ -199,7 +199,7 @@ class Audition(Sensor):
                         self.RATE) >= self.SILENCE_SEC:
                     self.IS_NOISE = True
                     self.logger.info(f"\t\tSENDING BLANK PAD. TRYING TO FORCE RESET.")
-                    return bytes([0] * self.CHUNK * 4)
+                    return bytes([0] * self.CHUNK * 16)
                 return data
             else:
                 self.past_window.append(data)
