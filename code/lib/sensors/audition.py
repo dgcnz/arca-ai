@@ -170,7 +170,7 @@ class Audition(Sensor):
             self.logger.info("Reading chunk")
             data = self._stream.read(self.CHUNK, exception_on_overflow=False)
             if self.CHANNELS > 1:
-                data = np.fromstring(data, dtype=np.int16)[0::self.CHANNELS]
+                data = (np.fromstring(data, dtype=np.int16)[0::self.CHANNELS]).tostring()
         except:
             return None
 
