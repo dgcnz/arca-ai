@@ -34,7 +34,6 @@ class Audition(Sensor):
         self.FORMAT = int(os.getenv("FORMAT"))
         self.CHANNELS = int(os.getenv("CHANNELS"))
         self._p = None
-        print(self.CHUNK, self.RATE, self.WIDTH, self.FORMAT, self.CHANNELS)
 
         try:
             self.DEVICE_INDEX = int(os.getenv("DEVICE_INDEX"))
@@ -48,6 +47,11 @@ class Audition(Sensor):
         self.past_window = deque(maxlen=int(self.SILENCE_SEC * self.RATE /
                                             self.CHUNK))
         self.logger = self.get_logger()
+        self.logger.info(f"CHUNK: {self.CHUNK}")
+        self.logger.info(f"RATE: {self.RATE}")
+        self.logger.info(f"WIDTH: {self.WIDTH}")
+        self.logger.info(f"FORMAT: {self.FORMAT}")
+        self.logger.info(f"CHANNELS: {self.CHANNELS}")
 
     def get_destinations_ID(self, raw_data: Any) -> List[Identifier]:
         """Decides which destinations to send raw_data.
@@ -77,10 +81,10 @@ class Audition(Sensor):
         """
         if msg == "PAUSE":
             self.pause()
-            self._stream.close()
+            self._stream.stop_stream()
         elif msg == "RESUME":
+            self._stream.start_stream()
             self.resume()
-            self._stream = self.get_stream()
         else:
             raise Exception("Unrecognized message.")
 
@@ -112,7 +116,6 @@ class Audition(Sensor):
             num_samples * 0.2) - self.BIAS
         if (self.THRESHOLD < 600):
             self.THRESHOLD = 1000
-            
 
         self.logger.info(f"Threshold set at {self.THRESHOLD}.")
         stream.close()
@@ -163,8 +166,9 @@ class Audition(Sensor):
 
         # Reads from pyaudio.stream
         try:
+            self.logger.info("Reading chunk")
             data = self._stream.read(self.CHUNK, exception_on_overflow=False)
-        except OSError:
+        except:
             return None
 
         # Takes 0.2 biggest values

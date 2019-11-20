@@ -68,7 +68,6 @@ class Sensor(Component, ABC):
                 break
             if self.waitable:
                 self.wait_event.wait()
-
             data = self.read_input()
             if data is not None:
                 self.send(data)
