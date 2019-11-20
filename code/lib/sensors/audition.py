@@ -105,9 +105,10 @@ class Audition(Sensor):
         input("Press Enter when ready.")
 
         for i in range(num_samples):
-            rms = audioop.rms(
-                stream.read(self.CHUNK, exception_on_overflow=False),
-                self.WIDTH)
+            temp = stream.read(self.CHUNK, exception_on_overflow=False)
+            if self.CHANNELS > 1:
+                temp = temp[0::self.CHANNELS]
+            rms = audioop.rms(temp, self.WIDTH)
             values.append(rms)
             self.logger.info(f"RMS: {rms:<5}")
 
@@ -168,6 +169,8 @@ class Audition(Sensor):
         try:
             self.logger.info("Reading chunk")
             data = self._stream.read(self.CHUNK, exception_on_overflow=False)
+            if self.CHANNELS > 1:
+                data = np.fromstring(data, dtype=np.int16)[0::self.CHANNELS]
         except:
             return None
 
