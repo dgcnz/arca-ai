@@ -1,5 +1,5 @@
 chatterbot-corpus
-chatterbot==1.0.4
+chatterbot==1.2.14
 pytz
 pyttsx3
 pocketsphinx
